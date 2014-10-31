@@ -12,7 +12,7 @@
 	?>
 		<tr>
 			<td><?php echo $received_receiving['receiving_id'];?></td>
-            <td><?php echo $received_receiving['inv_no'];?></td>
+            <td><?php echo $received_receiving['invoice_number'];?></td>
 			<td><?php echo date('m/d/Y',strtotime($received_receiving['receiving_time']));?></td>
 			<td>
 				<?php

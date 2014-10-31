@@ -212,7 +212,8 @@ class Sales extends Secure_area
 		$customer_id=$this->sale_lib->get_customer();
 		$employee_id=$this->Employee->get_logged_in_employee_info()->person_id;
 		$comment = $this->sale_lib->get_comment();
-		$trans_no = $this->sale_lib->get_trans_no();
+		$trans_no = $this->input->post('trans_no');
+		//$trans_no = $this->sale_lib->get_trans_no();
 		$emp_info=$this->Employee->get_info($employee_id);
 		$data['payments']=$this->sale_lib->get_payments();
 		$data['amount_change']=to_currency($this->sale_lib->get_amount_due() * -1);
@@ -250,6 +251,33 @@ class Sales extends Secure_area
 		$this->_remove_duplicate_cookies();
 	}
 	
+	function _substitute_trans_no($employee_info='')
+	{
+		$trans_no=$this->sale_lib->get_trans_no();
+		if (empty($trans_no))
+		{
+			$trans_no=$this->config->config['sale_trans_format'];
+		}
+		$trans_count=$this->Sale->get_trans_count();
+		$trans_no=str_replace('$TO',$trans_count,$trans_no);
+		$trans_no=strftime($trans_no);
+		
+		$employee_id= $this->Employee->get_logged_in_employee_info();
+		//$employee_id=$this->sale_lib->get_employee();
+		if($employee_id =-1)
+		{
+			$trans_no=str_replace('$EU',$employee_info->person_id,$trans_no);
+			$words = preg_split("/\s+/", $employee_info->person_id);
+			$acronym = "";
+			foreach ($words as $w) {
+				$acronym .= $w[0];
+			}
+			$trans_no=str_replace('$TI',$acronym,$trans_no);
+		}
+		//$this->sale_lib->set_trans_no('sale_trans_no');
+		return $trans_no;
+	}
+	
 	function receipt($sale_id)
 	{
 		$sale_info = $this->Sale->get_info($sale_id)->row_array();
@@ -265,6 +293,7 @@ class Sales extends Secure_area
 		$data['transaction_time']= date('m/d/Y h:i:s a', strtotime($sale_info['sale_time']));
 		$customer_id=$this->sale_lib->get_customer();
 		$emp_info=$this->Employee->get_info($sale_info['employee_id']);
+		//$trans_no = $this->sale_lib->get_trans_no();
 		$data['payment_type']=$sale_info['payment_type'];
 		$data['amount_change']=to_currency($this->sale_lib->get_amount_due() * -1);
 		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
@@ -327,7 +356,7 @@ class Sales extends Secure_area
 			'customer_id' => $this->input->post('customer_id') ? $this->input->post('customer_id') : null,
 			'employee_id' => $this->input->post('employee_id'),
 			'comment' => $this->input->post('comment'),
-			'trans_no' => $this->input->post('trans_no')
+			//'trans_no' => $this->input->post('trans_no')
 		);
 		
 		if ($this->Sale->update($sale_data, $sale_id))
@@ -394,6 +423,12 @@ class Sales extends Secure_area
 			$this->lang->line('sales_debit') => $this->lang->line('sales_debit'),
 			$this->lang->line('sales_credit') => $this->lang->line('sales_credit')
 		);
+		
+		$emp_info='';
+		//$emp_info=$this->Employee->get_info($person_id);
+		$emp_info = $this->Employee->get_logged_in_employee_info();
+		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
+		$data['trans_no']=$this->_substitute_trans_no($emp_info);
 
 		$customer_id=$this->sale_lib->get_customer();
 		if($customer_id!=-1)
@@ -405,7 +440,7 @@ class Sales extends Secure_area
 		
 		$data['payments_cover_total'] = $this->_payments_cover_total();
 		$this->load->view("sales/register",$data);
-		$this->_remove_duplicate_cookies();
+		//$this->_remove_duplicate_cookies();
 
 	}
 
@@ -450,8 +485,8 @@ class Sales extends Secure_area
 		}
 
 		//SAVE sale to database
-		$data['sale_id']='CR '.$this->Sale_suspended->save($data['cart'], $customer_id,$employee_id,$trans_no,$comment,$data['payments']);
-		if ($data['sale_id'] == 'CR -1')
+		$data['sale_id']='CR '.$this->Sale_suspended->save($data['cart'], $customer_id,$employee_id,$comment,$trans_no,$data['payments']);
+		if ($data['sale_id'] == 'PO -1')
 		{
 			$data['error_message'] = $this->lang->line('sales_transaction_failed');
 		}

@@ -69,47 +69,19 @@ class Sale_lib
 	}
 	
 	function get_trans_no()
-	{
-			if(!$this->CI->session->userdata('trans_no')){
-					
-				$d=date ("d");
-				$m=date ("m");
-				$y=date ("Y");
-				$h=date ("h");
-				$i=date ("i");
-				$s=date ("s");
-				$t=time();
-				$dmt="$h"."$i"."$s";    
-				$ran= rand(0,10000000);
-				$dmtran= $dmt+$ran;
-				$un=  uniqid();
-				$dmtun = $dmt.$un;
-				$mdun = md5($dmtran.$un);
-				$sort=substr($mdun, 3); // if you want sort length code.
-				//$data['person_info']=$this->Employee->get_info($employee_id);
-				//$employee_info = $this->Employee->get_info($employee_id);
-				$tsum_id = /*$maybe.'-'.*/$dmt;
-				//$lastinsert= $this->get_LastInserted($trans_no->trans_no);
-				$trans_no = $tsum_id;
-				return $trans_no;
-				//unset($_SESSION['trans_no']);
-			}
-			else
-			{
-				//$this->db->where('trans_no', $trans_no);
-				return $this->CI->session->userdata('trans_no');
-			}
-	}
-	
-	function set_trans_no($trans_no) 
-	{
-		$this->CI->session->set_userdata('trans_no', $trans_no);
-	}
-
-	function clear_trans_no() 	
-	{
-		$this->CI->session->unset_userdata('trans_no');
-	}
+    {
+    	return $this->CI->session->userdata('sale_trans_no');
+    }
+    
+    function set_trans_no($trans_no)
+    {
+    	$this->CI->session->set_userdata('sale_trans_no', $trans_no);
+    }
+    
+    function clear_trans_no()
+    {
+    	$this->CI->session->unset_userdata('sale_trans_no');
+    }
 	
 	function get_email_receipt() 
 	{
@@ -432,8 +404,8 @@ class Sale_lib
 			$this->add_item($row->item_id,-$row->quantity_purchased,$row->item_location,$row->discount_percent,$row->item_unit_price,$row->description,$row->serialnumber);
 		}
 		$this->set_customer($this->CI->Sale->get_customer($sale_id)->person_id);
-		$this->set_trans_no($this->CI->Sale_suspended->get_trans_no($sale_id));
-		$this->set_trans_no($this->CI->Sale->get_trans_no($sale_id));
+		//$this->set_trans_no($this->CI->Sale_suspended->get_trans_no($sale_id));
+		//$this->set_trans_no($this->CI->Sale->get_trans_no($sale_id));
 	}
 	
 	function add_item_kit($external_item_kit_id,$item_location)

@@ -24,15 +24,16 @@
 				else
 				{
 				?>
-					&nbsp;
-				<?php
+					<?php
+				  
+                 echo $suspended_sale['trans_no'];
 				}
-				?>
+				?> 
 			</td>
 			<td><?php echo $suspended_sale['comment'];?></td>
 			<td>
 				<?php 
-				echo form_open('sales/unsuspend');
+				echo form_open('cashier/unsuspend');
 				echo form_hidden('suspended_sale_id', $suspended_sale['sale_id']);
 				?>
 				<input type="submit" name="submit" value="<?php echo $this->lang->line('sales_unsuspend'); ?>" id="submit" class="submit_button float_right"></td>

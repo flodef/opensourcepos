@@ -10,6 +10,27 @@ class Cashier extends CI_Model
 		$this->db->where('sale_id',$sale_id);
 		return $this->db->get();
 	}
+	
+	function get_all()
+	{
+		$this->db->from('sales_suspended');
+		$this->db->order_by('sale_id');
+		return $this->db->get();
+	}
+	
+	function get_trans_count()
+	{
+		$this->db->from('sales_suspended');
+		$this->db->where('trans_no is not null');
+		return $this->db->count_all_results();
+	}
+	
+	function get_sale_by_trans_no($trans_no)
+	{
+		$this->db->from('sales_suspended');
+		$this->db->where('trans_no', $trans_no);
+		return $this->db->get();
+	}
 
 	function exists($sale_id)
 	{

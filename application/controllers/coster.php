@@ -212,12 +212,13 @@ class Coster extends Secure_area
 		$customer_id=$this->sale_lib->get_customer();
 		$employee_id=$this->Employee->get_logged_in_employee_info()->person_id;
 		$comment = $this->sale_lib->get_comment();
-		$trans_no = $this->sale_lib->get_trans_no();
+		$trans_no = $this->input->post('trans_no');
+		//$trans_no = $this->sale_lib->get_trans_no();
 		$emp_info=$this->Employee->get_info($employee_id);
 		$data['payments']=$this->sale_lib->get_payments();
 		$data['amount_change']=to_currency($this->sale_lib->get_amount_due() * -1);
 		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
-
+        
 		if($customer_id!=-1)
 		{
 			$cust_info=$this->Customer->get_info($customer_id);
@@ -249,7 +250,34 @@ class Coster extends Secure_area
 		$this->sale_lib->clear_all();
 		$this->_remove_duplicate_cookies();
 	}
-	
+		
+	function _substitute_trans_no($employee_info='')
+	{
+		$trans_no=$this->sale_lib->get_trans_no();
+		if (empty($trans_no))
+		{
+			$trans_no=$this->config->config['sale_trans_format'];
+		}
+		$trans_count=$this->Sale->get_trans_count();
+		$trans_no=str_replace('$TO',$trans_count,$trans_no);
+		$trans_no=strftime($trans_no);
+		
+		$employee_id= $this->Employee->get_logged_in_employee_info();
+		//$employee_id=$this->sale_lib->get_employee();
+		if($employee_id =-1)
+		{
+			$trans_no=str_replace('$EU',$employee_info->person_id,$trans_no);
+			$words = preg_split("/\s+/", $employee_info->person_id);
+			$acronym = "";
+			foreach ($words as $w) {
+				$acronym .= $w[0];
+			}
+			$trans_no=str_replace('$TI',$acronym,$trans_no);
+		}
+		//$this->sale_lib->set_trans_no('sale_trans_no');
+		return $trans_no;
+	}
+
 	function receipt($sale_id)
 	{
 		$sale_info = $this->Sale->get_info($sale_id)->row_array();
@@ -369,30 +397,20 @@ class Coster extends Secure_area
 	function _reload($data=array())
 	{
 		$person_info = $this->Employee->get_logged_in_employee_info();
-		$data['sale_id']=$this->sale_lib->get_sale_id();
-		$data['cart']=$this->sale_lib->get_cart();
-		$data['modes']=array('sale'=>$this->lang->line('sales_sale'),'return'=>$this->lang->line('sales_return'));
-		$data['mode']=$this->sale_lib->get_mode();
-		
-		$data['stock_locations'] = array();
-        $stock_locations = $this->Stock_locations->get_undeleted_all()->result_array();
-        $show_stock_locations = count($stock_locations) > 1;
-        if ($show_stock_locations) {
-	        foreach($stock_locations as $location_data)
-	        {            
-	            $data['stock_locations'][$location_data['location_id']] = $location_data['location_name'];
-	        }       		
-	        $data['stock_location']=$this->sale_lib->get_sale_location();
-        }
-        $data['show_stock_locations'] = $show_stock_locations;
-
+		$data['cart']=$this->sale_lib->get_cart();	 
+        $data['modes']=array('sale'=>$this->lang->line('sales_sale'),'return'=>$this->lang->line('sales_return'));
+        $data['mode']=$this->sale_lib->get_mode();
+                     
+        $data['stock_locations']=$this->Stock_locations->get_allowed_locations();
+        $data['stock_location']=$this->sale_lib->get_sale_location();
+        
 		$data['subtotal']=$this->sale_lib->get_subtotal();
 		$data['taxes']=$this->sale_lib->get_taxes();
 		$data['total']=$this->sale_lib->get_total();
-		$data['items_module_allowed'] = $this->Employee->has_grant('items', $person_info->person_id);
-		$data['comment'] = $this->sale_lib->get_comment();
+		$data['items_module_allowed']=$this->Employee->has_grant('items', $person_info->person_id);
+		$data['comment']=$this->sale_lib->get_comment();
+		$data['email_receipt']=$this->sale_lib->get_email_receipt();
 		$data['trans_no'] = $this->sale_lib->get_trans_no();
-		$data['email_receipt'] = $this->sale_lib->get_email_receipt();
 		$data['payments_total']=$this->sale_lib->get_payments_total();
 		$data['amount_due']=$this->sale_lib->get_amount_due();
 		$data['payments']=$this->sale_lib->get_payments();
@@ -403,7 +421,13 @@ class Coster extends Secure_area
 			$this->lang->line('sales_debit') => $this->lang->line('sales_debit'),
 			$this->lang->line('sales_credit') => $this->lang->line('sales_credit')
 		);
-		//$data['sale_id']='POS'.$sale_id;
+		
+		$emp_info='';
+		//$emp_info=$this->Employee->get_info($person_id);
+		$emp_info = $this->Employee->get_logged_in_employee_info();
+		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
+		$data['trans_no']=$this->_substitute_trans_no($emp_info);
+
 		$customer_id=$this->sale_lib->get_customer();
 		if($customer_id!=-1)
 		{
@@ -459,8 +483,8 @@ class Coster extends Secure_area
 		}
 
 		//SAVE sale to database
-		$data['sale_id']='CR '.$this->Sale_suspended->save($data['cart'], $customer_id,$employee_id,$trans_no,$comment,$data['payments']);
-		if ($data['sale_id'] == 'CR -1')
+		$data['sale_id']='CR '.$this->Sale_suspended->save($data['cart'], $customer_id,$employee_id,$comment,$trans_no,$data['payments']);
+		if ($data['sale_id'] == 'PO -1')
 		{
 			$data['error_message'] = $this->lang->line('sales_transaction_failed');
 		}

@@ -278,6 +278,16 @@ echo form_open('config/save/',array('id'=>'config_form'));
     </div>
 </div>
 
+<div class="field_row clearfix">    
+<?php echo form_label($this->lang->line('config_sale_trans_format').':', 'sale_trans_format',array('class'=>'wide')); ?>
+    <div class='form_field'>
+    <?php echo form_input(array(
+        'name'=>'sale_trans_format',
+        'id'=>'sale_trans_format',
+        'value'=>$this->config->item('sale_trans_format'))); ?>
+    </div>
+</div>
+
 <div class="field_row clearfix">	
 <?php echo form_label($this->lang->line('config_print_after_sale').':', 'print_after_sale',array('class'=>'wide')); ?>
 	<div class='form_field'>

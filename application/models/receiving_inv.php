@@ -14,11 +14,25 @@ class Receiving_inv extends CI_Model
 		$this->db->where('receiving_id',$receiving_id);
 		return $this->db->get();
 	}
+	
+	/*	function get_invoice_count()
+	{
+		$this->db->from('receivings');
+		$this->db->where('invoice_number is not null');
+		return $this->db->count_all_results();
+	}
+	
+	function get_receiving_inv_by_invoice_number($invoice_number)
+	{
+		$this->db->from('receivings');
+		$this->db->where('invoice_number', $invoice_number);
+		return $this->db->get();
+	}*/
 
 	function exists($receiving_id)
 	{
 		$this->db->from('receivings');
-		$this->db->where('receiving_id',receiving_id);
+		$this->db->where('receiving_id',$receiving_id);
 		$query = $this->db->get();
 
 		return ($query->num_rows()==1);
@@ -32,7 +46,7 @@ class Receiving_inv extends CI_Model
 		return $success;
 	}
 	
-	function save ($items,$supplier_id,$employee_id,$comment,$payment_type,$inv_no,$receiving_id=false)
+	function save ($items,$supplier_id,$employee_id,$comment,$payment_type,$invoice_number,$receiving_id=false)
 	{
 		if(count($items)==0)
 			return -1;
@@ -42,7 +56,7 @@ class Receiving_inv extends CI_Model
 		'employee_id'=>$employee_id,
 		'comment'=>$comment,
 		'payment_type'=>$payment_type,
-		'inv_no'=>$inv_no,
+		'invoice_number'=>$invoice_number,
 		
 		);
 
@@ -68,7 +82,7 @@ class Receiving_inv extends CI_Model
 				'discount_percent'=>$item['discount'],
 				'item_cost_price' => $cur_item_info->cost_price,
 				'item_unit_price'=>$item['price'],
-				'inv_no'=>$inv_no,
+				'invoice_number'=>$invoice_number,
 				'item_location'=>$item['item_location']
 			);
 
@@ -117,11 +131,11 @@ class Receiving_inv extends CI_Model
 		return $this->db->trans_status();
 	}
 	
-	function get_inv_no($receiving_id)
+	function get_invoice_number($receiving_id)
 	{
 		$this->db->from('receivings');
 		$this->db->where('receiving_id',$receiving_id);
-		return $this->db->get()->row()->inv_no;
+		return $this->db->get()->row()->invoice_number;
 	}
 
 	function get_receiving_items($receiving_id)
@@ -144,13 +158,5 @@ class Receiving_inv extends CI_Model
 		$this->db->where('receiving_id',$receiving_id);
 		return $this->db->get()->row()->comment;
 	}
-	
-/*	function get_receiving_id($receiving_id)
-	{
-		$this->db->from('receivings');
-		$this->db->where('receiving_id',$receiving_id);
-		return $this->db->get()->row()->receiving_id;
-	}*/
-
 }
 ?>

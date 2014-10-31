@@ -25,6 +25,11 @@ if (isset($success))
 <span><?php echo $this->lang->line('coster_trans_no') ?></span>         
 <?php echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'4'));?> 
 
+<?php /*?><?php echo form_open('cashier/unsusp'); 
+echo $this->lang->line('coster_trans_no');        
+echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'4'));?> 
+<input type="submit" name="submit" value="<?php echo $this->lang->line('sales_unsuspend'); ?>" id="submit">
+<?php */?>
 	<div id="show_suspended_sales_button_cashier">
      
     <?php
@@ -192,7 +197,7 @@ else
                 <div class="float_left" style="text-align:center;font-weight:bold;font-size:16px;">
 				<label id="comment_label" for="comment"><?php echo $this->lang->line('common_comments'); ?>:</label></div>
 				<?php echo form_textarea(array('name'=>'comment', 'id' => 'comment', 'value'=>$comment,'rows'=>'4','cols'=>'28'));?>
-	          	<?php echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'34'));?> 
+	          	<?php echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'31'));?> 
                 <br /><br />   
 				<?php
 				

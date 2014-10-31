@@ -1,5 +1,4 @@
 <?php
-
 class Receiving_lib
 {
 	var $CI;
@@ -33,6 +32,21 @@ class Receiving_lib
 	function set_supplier($supplier_id)
 	{
 		$this->CI->session->set_userdata('supplier',$supplier_id);
+	}
+	
+	function get_receiving_id() 
+	{
+			return $this->CI->session->userdata('receiving_id');
+	}	
+	
+	function set_receiving_id($receiving_id) 
+	{	
+	$this->CI->session->set_userdata('receiving_id', $receiving_id);
+	}
+	
+	function clear_receiving_id() 	
+	{
+		$this->CI->session->unset_userdata('receiving_id');
 	}
 
 	function get_mode()
@@ -268,6 +282,7 @@ class Receiving_lib
 			$this->add_item($row->item_id,-$row->quantity_purchased,$row->item_location,$row->discount_percent,$row->item_unit_price,$row->description,$row->serialnumber);
 		}
 		$this->set_supplier($this->CI->Receiving->get_supplier($receiving_id)->person_id);
+		//$this->set_invoice_number($this->CI->Receiving->get_invoice_number($receiving_id));
 	}
 	
 	function add_item_kit($external_item_kit_id,$item_location)
@@ -319,6 +334,7 @@ class Receiving_lib
 			$this->add_item($row->item_id,$row->quantity_purchased,$row->item_location,$row->discount_percent,$row->item_unit_price,$row->description,$row->serialnumber);
 		}
 		$this->set_supplier($this->CI->Receiving_inv->get_supplier($receiving_id)->person_id);
+		$this->set_invoice_number($this->CI->Receiving_inv->get_invoice_number($receiving_id));
 		$this->set_comment($this->CI->Receiving_inv->get_comment($receiving_id));
 	}
 
@@ -339,6 +355,11 @@ class Receiving_lib
 		$this->CI->session->unset_userdata('supplier');
 	}
 	
+	/*function delete_invoice_number()
+	{
+		$this->CI->session->unset_userdata('recv_invoice_number');
+	}*/
+
 	function clear_mode()
 	{
 		$this->CI->session->unset_userdata('receiving_mode');

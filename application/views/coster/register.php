@@ -1,7 +1,5 @@
 <?php $this->load->view("partial/header"); ?>
 <div id="page_title" style="margin-bottom:8px;"><?php echo $this->lang->line('item_costing'); ?></div>
- <?php
-?>
 <?php
 if(isset($error))
 {
@@ -21,15 +19,11 @@ if (isset($success))
 
 <?php
 // Coster display
-
- $ytl = $this->lang->line()." $user_info->person_id ";
-//echo $ytl;
-
 ?>
 
 <div id="register_wrapper">
 <?php echo form_open("coster/change_mode",array('id'=>'mode_form')); ?>
-	<?php if ($show_stock_locations): ?>
+	<?php if (count($stock_locations) > 1): ?>
 <span><?php echo $this->lang->line('sales_stock_location') ?></span>
 <?php echo form_dropdown('stock_location',$stock_locations,$stock_location,'onchange="$(\'#mode_form\').submit();"'); ?>
 <?php endif; ?>
@@ -40,16 +34,13 @@ if (isset($success))
 	{
 	?>
 	<span><?php echo $this->lang->line('coster_trans_no') ?></span>
-    <?php echo $trans_no ."$ytl" ?>  
+    <?php echo form_input(array('name'=>'trans_no','id'=>'trans_no','value'=>$trans_no,'size'=>10));?>
     <?php
 	}
 	?>
 </div>
     
 	</form>
-<?php echo form_open("coster/add",array('id'=>'add_item_form')); ?>
-<label id="item_label" for="item">
-
 <?php echo form_open("coster/add",array('id'=>'add_item_form')); ?>
 <label id="item_label" for="item">
 
@@ -286,7 +277,7 @@ else
 				<?php echo form_open("coster/complete",array('id'=>'finish_sale_form')); ?>
 				<label id="comment_label" for="comment"><?php echo $this->lang->line('common_comments'); ?>:</label>
 				<?php echo form_textarea(array('name'=>'comment', 'id' => 'comment', 'value'=>$comment,'rows'=>'4','cols'=>'28'));?>
-	          	<?php echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'28'));?> 
+	          	<?php echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'31'));?> 
                 <br /><br />      
 		<?php
 		// Only show this part if there is at least one payment entered.
@@ -327,7 +318,7 @@ else
 
 		<div style="height:40px;">
 
-			<div class='small_button' id='post_order_button' style='margin:5 auto;'>
+			<div class='small_button' id='post_order_button' style='margin:15 auto;'>
 				<span><?php echo $this->lang->line('sales_add_payment_coster'); ?></span>
             </div>
 		</div>

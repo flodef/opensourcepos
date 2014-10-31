@@ -6,13 +6,14 @@ define("FORM_WIDTH", "400");
 
 class Reports extends Secure_area 
 {	
-	
+
 	function __construct()
 	{
 		parent::__construct('reports');
 		$method_name = $this->uri->segment(2);
 		$exploder = explode('_', $method_name);
-		preg_match("/(?:inventory)|([^_.]*)(?:_graph|_row)?$/", $method_name, $matches);
+		$submodule_id = preg_match("/([^_.]*)(?:_graph)?$/", $method_name, $matches);
+		preg_match("/(?:inventory)|([^_.]*)(?:_graph)?$/", $method_name, $matches);
 		preg_match("/^(.*?)([sy])?$/", array_pop($matches), $matches);
 		$submodule_id = $matches[1] . ((count($matches) > 2) ? $matches[2] : "s");
 		$employee_id=$this->Employee->get_logged_in_employee_info()->person_id;
@@ -72,28 +73,7 @@ class Reports extends Secure_area
 				to_currency($report_data['profit']), 
 				$report_data['payment_type'], 
 				$report_data['comment']);
-		echo get_detailed_data_row($summary_data, $this);
-	}
-	
-	function get_detailed_receivings_row($receiving_id, $receiving_type=1)
-	{
-		$this->load->model('reports/Detailed_receivings');
-		$model = $this->Detailed_receivings;
-	
-		$report_data = $model->getDataByReceivingId($receiving_id, $receiving_type);
-	
-		$summary_data = array(anchor('receivings/edit/'.$report_data['receiving_id'] . '/width:'.FORM_WIDTH,
-				'RECV '.$report_data['receiving_id'],
-				array('class' => 'thickbox')),
-				$report_data['receiving_date'],
-				$report_data['items_purchased'],
-				$report_data['employee_name'],
-				$report_data['supplier_name'],
-				to_currency($report_data['total']),
-				$report_data['payment_type'],
-				$report_data['invoice_number'],
-				$report_data['comment']);
-		echo get_detailed_data_row($summary_data, $this);
+		echo get_detailed_sales_data_row($summary_data, $this);
 	}
 	
 	function get_summary_data($start_date, $end_date = NULL, $sale_type=0) 
@@ -890,7 +870,7 @@ class Reports extends Secure_area
 		
 		foreach($report_data['summary'] as $key=>$row)
 		{
-			$summary_data[] = array(anchor('receivings/edit/'.$row['receiving_id'].'/width:'.FORM_WIDTH, 'RECV '.$row['receiving_id'], array('class' => 'thickbox')), $row['receiving_date'], $row['items_purchased'], $row['employee_name'], $row['supplier_name'], to_currency($row['total']), $row['payment_type'], $row['invoice_number'], $row['comment']);
+			$summary_data[] = array(anchor('receivings/receipt/'.$row['receiving_id'], 'RECV '.$row['receiving_id'], array('target' => '_blank')), $row['receiving_date'], $row['items_purchased'], $row['employee_name'], $row['supplier_name'], to_currency($row['total']), $row['payment_type'], $row['invoice_number'], $row['comment']);
 			
 			foreach($report_data['details'][$key] as $drow)
 			{
@@ -902,7 +882,6 @@ class Reports extends Secure_area
 			"title" =>$this->lang->line('reports_detailed_receivings_report'),
 			"subtitle" => date('m/d/Y', strtotime($start_date)) .'-'.date('m/d/Y', strtotime($end_date)),
 			"headers" => $model->getDataColumns(),
-			"editable" => "receivings",
 			"summary_data" => $summary_data,
 			"details_data" => $details_data,
 			"overall_summary_data" => $model->getSummaryData(array('start_date'=>$start_date, 'end_date'=>$end_date, 'receiving_type' => $receiving_type)),
