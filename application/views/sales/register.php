@@ -1,4 +1,4 @@
-﻿<?php $this->load->view("partial/header"); ?>
+<?php $this->load->view("partial/header"); ?>
 <div id="page_title" style="margin-bottom: 8px;"><?php echo $this->lang->line('sales_register'); ?></div>
 <?php
 if(isset($error))
@@ -20,35 +20,20 @@ if (isset($success))
 <?php echo form_open("sales/change_mode",array('id'=>'mode_form')); ?>
 	<span><?php echo $this->lang->line('sales_mode') ?></span>
 <?php echo form_dropdown('mode',$modes,$mode,'onchange="$(\'#mode_form\').submit();"'); ?>
-&nbsp &nbsp
 <?php if (count($stock_locations) > 1): ?>
 <span><?php echo $this->lang->line('sales_stock_location') ?></span>
 <?php echo form_dropdown('stock_location',$stock_locations,$stock_location,'onchange="$(\'#mode_form\').submit();"'); ?>
 <?php endif; ?>
-
-     <?php
-// 
-	?>
-
 <div id= 'num3'>
      <?php  echo form_open("sales/complete",array('id'=>'finish_sale_form')); ?>       
- 	 <span><?php echo $this->lang->line('sale_trans_no') ?></span><span>&nbsp;</span>        
- 	 <?php echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'4'));?> 
+ 	 <span><?php echo $this->lang->line('sales_invoice_number') ?></span><span>&nbsp;</span>        
+ 	 <?php echo form_input(array('name'=>'invoice_number', 'id' => 'sales_invoice_number', 'value'=>$invoice_number,'size'=>'4'));?> 
 	</div>
 	</form>
 <?php echo form_open("sales/add",array('id'=>'add_item_form')); ?>
 <label id="item_label" for="item">
 
-<?php
-if($mode=='sale_retail' or $mode=='sale_wholesale')
-{
-	echo $this->lang->line('sales_find_or_scan_item');
-}
-else
-{
-	echo $this->lang->line('sales_find_or_scan_item_or_receipt');
-}
-?>
+<?php echo $this->lang->line('sales_find_or_scan_item_or_receipt'); ?>
 </label>
 
 <?php echo form_input(array('name'=>'item','id'=>'item','size'=>'40'));?>
@@ -60,12 +45,8 @@ else
 		?>
 	</div>
 -->
-
-
-
-
-
-<div id="show_suspended_sales_button">
+		
+	<div id="show_suspended_sales_button">
 	<?php
 	// This part conntrols if there are Items already in the sale.
 	if(count($cart)==0)
@@ -81,8 +62,7 @@ else
      <?php
 		}
 		?>  
-</div>
-
+	</div>
 	</form>
 	<table id="register">
 		<thead>
@@ -103,10 +83,11 @@ if(count($cart)==0)
 {
 ?>
 <tr>
-	<td colspan='8'>
-	<div class='warning_message' style='padding: 7px;'><?php echo $this->lang->line('sales_no_items_in_cart'); ?></div>
-	</tr>
-	</tr>
+				<td colspan='8'>
+					<div class='warning_message' style='padding: 7px;'><?php echo $this->lang->line('sales_no_items_in_cart'); ?></div>
+			
+			</tr>
+			</tr>
 <?php
 }
 else
@@ -218,6 +199,7 @@ else
 	</table>
 </div>
 
+
 <div id="overall_sale">
 	<?php
 	if(isset($customer))
@@ -243,18 +225,21 @@ else
 	}
 	?>
 
-		<div id='sale_details' style="font-size:16px;">
-		<div class="float_left" style="width:55%;"><?php echo $this->lang->line('sales_sub_total'); ?>:</div>
-		<div class="float_left" style="width:45%;font-weight:bold;text-align:right;"><?php echo to_currency($subtotal); ?></div>
+	<div id='sale_details'>
+		<div class="float_left" style="width: 55%;"><?php echo $this->lang->line('sales_sub_total'); ?>:</div>
+		<div class="float_left" style="width: 45%; font-weight: bold;"><?php echo to_currency($subtotal); ?></div>
 
 		<?php foreach($taxes as $name=>$value) { ?>
-		<div class="float_left" style='width:55%;'><?php echo $name; ?>:</div>
-		<div class="float_left" style="width:45%;font-weight:bold;text-align:right;"><?php echo to_currency($value); ?></div>
+		<div class="float_left" style='width: 55%;'><?php echo $name; ?>:</div>
+		<div class="float_left" style="width: 45%; font-weight: bold;"><?php echo to_currency($value); ?></div>
 		<?php }; ?>
 
-		<div class="float_left" style='width:55%;'><?php echo $this->lang->line('sales_total'); ?>:</div>
-		<div class="float_left" style="width:45%;font-weight:bold;text-align:right;"><?php echo to_currency($total); ?></div>
+		<div class="float_left" style='width: 55%;'><?php echo $this->lang->line('sales_total'); ?>:</div>
+		<div class="float_left" style="width: 45%; font-weight: bold;"><?php echo to_currency($total); ?></div>
 	</div>
+
+
+
 
 	<?php
 	// Only show this part if there are Items already in the sale.
@@ -279,11 +264,7 @@ else
 			<div id="finish_sale">
 				<?php echo form_open("sales/complete",array('id'=>'finish_sale_form')); ?>
 				<label id="comment_label" for="comment"><?php echo $this->lang->line('common_comments'); ?>:</label>
-				<?php echo form_textarea(array('name'=>'comment', 'id' => 'comment', 'value'=>$comment,'rows'=>'4','cols'=>'28'));?>
-				<br />
-		<br />
-		<?php echo $this->lang->line('sales_trans_no').':   ';?>
-				<?php echo form_input(array('name'=>'trans_no','id'=>'trans_no','value'=>$trans_no,'size'=>10));?>
+				<?php echo form_textarea(array('name'=>'comment', 'id' => 'comment', 'value'=>$comment,'rows'=>'4','cols'=>'23'));?>
 				<br />
 		<br />
 				
@@ -303,7 +284,7 @@ else
 				{
 					echo "<div class='small_button' id='finish_sale_button' style='float:left;margin-top:5px;'><span>".$this->lang->line('sales_complete_sale')."</span></div>";
 				}
-				echo "<div class='small_button' id='post_order_button' style='float:right;margin-top:5px;'><span>".$this->lang->line('sales_suspend_sale')."</span></div>";
+				echo "<div class='small_button' id='suspend_sale_button' style='float:right;margin-top:5px;'><span>".$this->lang->line('sales_suspend_sale')."</span></div>";
 				?>
 			</div>
 	</form>
@@ -313,14 +294,17 @@ else
 
 
 
-    <table width="97%"><tr>
-    <td style="width:55%; "><div class="float_left"><?php echo $this->lang->line('sales_payments_total').':';?></div></td>
-    <td style="width:45%;font-weight:bold;text-align:right;"><div class="float_right" style="text-align:right;font-weight:bold;"><?php echo to_currency($payments_total); ?></div></td>
-	</tr>
-	<tr>
-	<td style="width:55%; "><div class="float_left" ><?php echo $this->lang->line('sales_amount_due').':';?></div></td>
-	<td style="width:45%;"><div class="float_right" style="text-align:right;font-weight:bold;"><?php echo to_currency($amount_due); ?></div></td>
-	</tr>
+    <table width="100%">
+		<tr>
+			<td style="width: 55%;"><div class="float_left"><?php echo $this->lang->line('sales_payments_total').':';?></div></td>
+			<td style="width: 45%; text-align: right;"><div class="float_left"
+					style="text-align: right; font-weight: bold;"><?php echo to_currency($payments_total); ?></div></td>
+		</tr>
+		<tr>
+			<td style="width: 55%;"><div class="float_left"><?php echo $this->lang->line('sales_amount_due').':';?></div></td>
+			<td style="width: 45%; text-align: right;"><div class="float_left"
+					style="text-align: right; font-weight: bold;"><?php echo to_currency($amount_due); ?></div></td>
+		</tr>
 	</table>
 
 	<div id="Payment_Types">
@@ -402,6 +386,7 @@ else
 </div>
 <div class="clearfix" style="margin-bottom: 30px;">&nbsp;</div>
 
+
 <?php $this->load->view("partial/footer"); ?>
 
 <script type="text/javascript" language="javascript">
@@ -455,20 +440,21 @@ $(document).ready(function()
     	$(this).attr('value',"<?php echo $this->lang->line('sales_start_typing_customer_name'); ?>");
     });
 	
-	$('#comment').change(function() 
+	$('#comment').keyup(function() 
 	{
 		$.post('<?php echo site_url("sales/set_comment");?>', {comment: $('#comment').val()});
 	});
 	
-	$('#trans_no').change(function()
+	$('#sales_invoice_number').keyup(function() 
 	{
-	$.post('<?php echo site_url("sales/set_trans_no");?>', {trans_no: $('#trans_no').val()});
+		$.post('<?php echo site_url("sales/set_invoice_number");?>', {sales_invoice_number: $('#sales_invoice_number').val()});
 	});
-
+	
 	$('#email_receipt').change(function() 
 	{
 		$.post('<?php echo site_url("sales/set_email_receipt");?>', {email_receipt: $('#email_receipt').is(':checked') ? '1' : '0'});
 	});
+	
 	
     $("#finish_sale_button").click(function()
     {
@@ -481,25 +467,6 @@ $(document).ready(function()
 	$("#suspend_sale_button").click(function()
 	{
 		if (confirm('<?php echo $this->lang->line("sales_confirm_suspend_sale"); ?>'))
-    	{
-			$('#finish_sale_form').attr('action', '<?php echo site_url("sales/suspend"); ?>');
-    		$('#finish_sale_form').submit();
-    	}
-	});
-	
-	$("#new_order_button").click(function()
-	{
-		if (confirm('<?php echo $this->lang->line("sales_confirm_order_sale"); ?>'))
-    	{
-			$('#finish_sale_form').attr('action', '<?php echo site_url("sales/suspend"); ?>');
-    		$('#finish_sale_form').submit();
-    	}
-	});
-
-	$("#post_order_button").click(function()
-	{
-		if (confirm('<?php echo $this->lang->line("post_order_confirm").'   '.("Please Confirm Transancation ID:-"."$trans_no"); ?>'
-		))
     	{
 			$('#finish_sale_form').attr('action', '<?php echo site_url("sales/suspend"); ?>');
     		$('#finish_sale_form').submit();

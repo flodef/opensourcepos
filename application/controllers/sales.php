@@ -54,14 +54,9 @@ class Sales extends Secure_area
  	  $this->sale_lib->set_comment($this->input->post('comment'));
 	}
 	
-	function set_trans_no() 
+	function set_invoice_number()
 	{
- 	  $this->sale_lib->set_trans_no($this->input->post('trans_no'));
-	}
-	
-	function set_sale_id() 
-	{
- 	  $this->sale_lib->set_trans_no($this->input->post('sale_id'));
+		$this->sale_lib->set_invoice_number($this->input->post('sales_invoice_number'));
 	}
 	
 	function set_email_receipt()
@@ -212,8 +207,6 @@ class Sales extends Secure_area
 		$customer_id=$this->sale_lib->get_customer();
 		$employee_id=$this->Employee->get_logged_in_employee_info()->person_id;
 		$comment = $this->sale_lib->get_comment();
-		$trans_no = $this->input->post('trans_no');
-		//$trans_no = $this->sale_lib->get_trans_no();
 		$emp_info=$this->Employee->get_info($employee_id);
 		$data['payments']=$this->sale_lib->get_payments();
 		$data['amount_change']=to_currency($this->sale_lib->get_amount_due() * -1);
@@ -226,8 +219,8 @@ class Sales extends Secure_area
 		}
 
 		//SAVE sale to database
-		$data['sale_id']='CR '.$this->Sale->save($data['cart'], $customer_id,$employee_id,$comment,$trans_no,$data['payments']);
-		if ($data['sale_id'] == 'CR -1')
+		$data['sale_id']='POS '.$this->Sale->save($data['cart'], $customer_id,$employee_id,$comment,$data['payments']);
+		if ($data['sale_id'] == 'POS -1')
 		{
 			$data['error_message'] = $this->lang->line('sales_transaction_failed');
 		}
@@ -251,31 +244,32 @@ class Sales extends Secure_area
 		$this->_remove_duplicate_cookies();
 	}
 	
-	function _substitute_trans_no($employee_info='')
+	function _substitute_invoice_number($customer_info='')
 	{
-		$trans_no=$this->sale_lib->get_trans_no();
-		if (empty($trans_no))
+		$invoice_number=$this->sale_lib->get_invoice_number();
+		if (empty($invoice_number))
 		{
-			$trans_no=$this->config->config['sale_trans_format'];
+			$invoice_number=$this->config->config['sales_invoice_format'];
 		}
-		$trans_count=$this->Sale->get_trans_count();
-		$trans_no=str_replace('$TO',$trans_count,$trans_no);
-		$trans_no=strftime($trans_no);
-		
-		$employee_id= $this->Employee->get_logged_in_employee_info();
-		//$employee_id=$this->sale_lib->get_employee();
-		if($employee_id =-1)
+		$invoice_count=$this->Sale->get_invoice_count();
+		$invoice_number=str_replace('$CO',$invoice_count,$invoice_number);
+		$invoice_count=$this->Sale_suspended->get_invoice_count();
+		$invoice_number=str_replace('$SCO',$invoice_count,$invoice_number);
+		$invoice_number=strftime($invoice_number);
+	
+		$customer_id=$this->sale_lib->get_customer();
+		if($customer_id!=-1)
 		{
-			$trans_no=str_replace('$EU',$employee_info->person_id,$trans_no);
-			$words = preg_split("/\s+/", $employee_info->person_id);
+			$invoice_number=str_replace('$CU',$customer_info->first_name . ' ' . $customer_info->last_name,$invoice_number);
+			$words = preg_split("/\s+/", $customer_info->first_name . ' ' . $customer_info->last_name);
 			$acronym = "";
 			foreach ($words as $w) {
 				$acronym .= $w[0];
 			}
-			$trans_no=str_replace('$TI',$acronym,$trans_no);
+			$invoice_number=str_replace('$CI',$acronym,$invoice_number);
 		}
-		//$this->sale_lib->set_trans_no('sale_trans_no');
-		return $trans_no;
+		$this->sale_lib->set_invoice_number($invoice_number);
+		return $invoice_number;
 	}
 	
 	function receipt($sale_id)
@@ -293,8 +287,8 @@ class Sales extends Secure_area
 		$data['transaction_time']= date('m/d/Y h:i:s a', strtotime($sale_info['sale_time']));
 		$customer_id=$this->sale_lib->get_customer();
 		$emp_info=$this->Employee->get_info($sale_info['employee_id']);
-		//$trans_no = $this->sale_lib->get_trans_no();
 		$data['payment_type']=$sale_info['payment_type'];
+		$data['invoice_number']=$this->sale_lib->get_invoice_number();
 		$data['amount_change']=to_currency($this->sale_lib->get_amount_due() * -1);
 		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
 
@@ -303,11 +297,10 @@ class Sales extends Secure_area
 			$cust_info=$this->Customer->get_info($customer_id);
 			$data['customer']=$cust_info->first_name.' '.$cust_info->last_name;
 		}
-		$data['sale_id']='CR '.$sale_id;
+		$data['sale_id']='POS '.$sale_id;
 		$this->load->view("sales/receipt",$data);
 		$this->sale_lib->clear_all();
 		$this->_remove_duplicate_cookies();
-
 	}
 	
 	function edit($sale_id)
@@ -356,7 +349,7 @@ class Sales extends Secure_area
 			'customer_id' => $this->input->post('customer_id') ? $this->input->post('customer_id') : null,
 			'employee_id' => $this->input->post('employee_id'),
 			'comment' => $this->input->post('comment'),
-			//'trans_no' => $this->input->post('trans_no')
+			'invoice_number' => $this->input->post('invoice_number')
 		);
 		
 		if ($this->Sale->update($sale_data, $sale_id))
@@ -412,7 +405,6 @@ class Sales extends Secure_area
 		$data['items_module_allowed']=$this->Employee->has_grant('items', $person_info->person_id);
 		$data['comment']=$this->sale_lib->get_comment();
 		$data['email_receipt']=$this->sale_lib->get_email_receipt();
-		$data['trans_no'] = $this->sale_lib->get_trans_no();
 		$data['payments_total']=$this->sale_lib->get_payments_total();
 		$data['amount_due']=$this->sale_lib->get_amount_due();
 		$data['payments']=$this->sale_lib->get_payments();
@@ -423,25 +415,20 @@ class Sales extends Secure_area
 			$this->lang->line('sales_debit') => $this->lang->line('sales_debit'),
 			$this->lang->line('sales_credit') => $this->lang->line('sales_credit')
 		);
-		
-		$emp_info='';
-		//$emp_info=$this->Employee->get_info($person_id);
-		$emp_info = $this->Employee->get_logged_in_employee_info();
-		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
-		$data['trans_no']=$this->_substitute_trans_no($emp_info);
 
 		$customer_id=$this->sale_lib->get_customer();
+		$cust_info='';
+		
 		if($customer_id!=-1)
 		{
-			$info=$this->Customer->get_info($customer_id);
-			$data['customer']=$info->first_name.' '.$info->last_name;
-			$data['customer_email']=$info->email;
+			$cust_info=$this->Customer->get_info($customer_id);
+			$data['customer']=$cust_info->first_name.' '.$cust_info->last_name;
+			$data['customer_email']=$cust_info->email;
 		}
-		
+		$data['invoice_number']=$this->_substitute_invoice_number($cust_info);
 		$data['payments_cover_total'] = $this->_payments_cover_total();
 		$this->load->view("sales/register",$data);
-		//$this->_remove_duplicate_cookies();
-
+		$this->_remove_duplicate_cookies();
 	}
 
     function cancel_sale()
@@ -462,7 +449,8 @@ class Sales extends Secure_area
 		$customer_id=$this->sale_lib->get_customer();
 		$employee_id=$this->Employee->get_logged_in_employee_info()->person_id;
 		$comment = $this->input->post('comment');
-		$trans_no = $this->input->post('trans_no');
+		$invoice_number=$this->sale_lib->get_invoice_number();
+		
 		$emp_info=$this->Employee->get_info($employee_id);
 		$payment_type = $this->input->post('payment_type');
 		$data['payment_type']=$this->input->post('payment_type');
@@ -485,13 +473,13 @@ class Sales extends Secure_area
 		}
 
 		//SAVE sale to database
-		$data['sale_id']='CR '.$this->Sale_suspended->save($data['cart'], $customer_id,$employee_id,$comment,$trans_no,$data['payments']);
-		if ($data['sale_id'] == 'PO -1')
+		$data['sale_id']='POS '.$this->Sale_suspended->save($data['cart'], $customer_id,$employee_id,$comment,$data['payments']);
+		if ($data['sale_id'] == 'POS -1')
 		{
 			$data['error_message'] = $this->lang->line('sales_transaction_failed');
 		}
 		$this->sale_lib->clear_all();
-		$this->_reload(array('success' => $this->lang->line('sales_successfully_post_sale')));
+		$this->_reload(array('success' => $this->lang->line('sales_successfully_suspended_sale')));
 	}
 	
 	function suspended()
@@ -508,6 +496,14 @@ class Sales extends Secure_area
 		$this->sale_lib->copy_entire_suspended_sale($sale_id);
 		$this->Sale_suspended->delete($sale_id);
     	$this->_reload();
+	}
+	
+	function check_invoice_number()
+	{
+		$sale_id=$this->input->post('sale_id');
+		$invoice_number=$this->input->post('invoice_number');
+		$exists=!empty($invoice_number) && $this->Sale->invoice_number_exists($invoice_number,$sale_id);
+		echo json_encode(array('success'=>!$exists,'message'=>$this->lang->line('sales_invoice_number_duplicate')));
 	}
 }
 ?>

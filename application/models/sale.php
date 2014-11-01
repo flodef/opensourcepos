@@ -3,35 +3,26 @@ class Sale extends CI_Model
 {
 	public function get_info($sale_id)
 	{
-		$this->db->select('sales.*', FALSE);
-		$this->db->select('people.*', FALSE);
 		$this->db->from('sales');
 		$this->db->join('people', 'people.person_id = sales.customer_id', 'LEFT');
 		$this->db->where('sale_id',$sale_id);
 		return $this->db->get();
 	}
-
-	function get_all()
-	{
-		$this->db->from('sales_suspended');
-		$this->db->order_by('sale_id');
-		return $this->db->get();
-	}
 	
-	function get_trans_count()
+	function get_invoice_count()
 	{
-		$this->db->from('sales_suspended');
-		$this->db->where('trans_no is not null');
+		$this->db->from('sales');
+		$this->db->where('invoice_number is not null');
 		return $this->db->count_all_results();
 	}
 	
-	function get_sale_by_trans_no($trans_no)
+	function get_sale_by_invoice_number($invoice_number)
 	{
-		$this->db->from('sales_suspended');
-		$this->db->where('trans_no', $trans_no);
+		$this->db->from('sales');
+		$this->db->where('invoice_number', $invoice_number);
 		return $this->db->get();
 	}
-	
+
 	function exists($sale_id)
 	{
 		$this->db->from('sales');
@@ -49,7 +40,7 @@ class Sale extends CI_Model
 		return $success;
 	}
 	
-	function save ($items,$customer_id,$employee_id,$comment,$trans_no,$payments,$sale_id=false)
+	function save ($items,$customer_id,$employee_id,$comment,$payments,$sale_id=false,$invoice_number=NULL)
 	{
 		if(count($items)==0)
 			return -1;
@@ -64,11 +55,11 @@ class Sale extends CI_Model
 
 		$sales_data = array(
 			'sale_time' => date('Y-m-d H:i:s'),
-			'trans_no' =>$trans_no,
 			'customer_id'=> $this->Customer->exists($customer_id) ? $customer_id : null,
 			'employee_id'=>$employee_id,
 			'payment_type'=>$payment_types,
-			'comment'=>$comment
+			'comment'=>$comment,
+			'invoice_number'=>empty($invoice_number) ? NULL : $invoice_number
 		);
 
 		//Run these queries as a transaction, we want to make sure we do all or nothing
@@ -164,7 +155,8 @@ class Sale extends CI_Model
 		return $sale_id;
 	}
 	
-	function delete_list($sale_ids, $employee_id,$update_inventory=TRUE) {
+	function delete_list($sale_ids, $employee_id,$update_inventory=TRUE) 
+	{
 		$result = TRUE;
 		foreach($sale_ids as $sale_id) {
 			$result &= $this->delete($sale_id, $employee_id, $update_inventory);
@@ -172,7 +164,8 @@ class Sale extends CI_Model
 		return $result;
 	}
 	
-	function delete($sale_id,$employee_id,$update_inventory=TRUE) {
+	function delete($sale_id,$employee_id,$update_inventory=TRUE) 
+	{
 		// start a transaction to assure data integrity
 		$this->db->trans_start();
 		// first delete all payments
@@ -227,6 +220,18 @@ class Sale extends CI_Model
 		$this->db->from('sales');
 		$this->db->where('sale_id',$sale_id);
 		return $this->Customer->get_info($this->db->get()->row()->customer_id);
+	}
+	
+	function invoice_number_exists($invoice_number,$sale_id='')
+	{
+		$this->db->from('sales');
+		$this->db->where('invoice_number', $invoice_number);
+		if (!empty($sale_id))
+		{
+			$this->db->where('sale_id !=', $sale_id);
+		}
+		$query=$this->db->get();
+		return ($query->num_rows()==1);
 	}
 
 	//We create a temp table that allows us to do easy report/sales queries

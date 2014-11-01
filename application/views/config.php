@@ -279,12 +279,12 @@ echo form_open('config/save/',array('id'=>'config_form'));
 </div>
 
 <div class="field_row clearfix">    
-<?php echo form_label($this->lang->line('config_sale_trans_format').':', 'sale_trans_format',array('class'=>'wide')); ?>
+<?php echo form_label($this->lang->line('config_sales_invoice_format').':', 'sales_invoice_format',array('class'=>'wide')); ?>
     <div class='form_field'>
     <?php echo form_input(array(
-        'name'=>'sale_trans_format',
-        'id'=>'sale_trans_format',
-        'value'=>$this->config->item('sale_trans_format'))); ?>
+        'name'=>'sales_invoice_format',
+        'id'=>'sales_invoice_format',
+        'value'=>$this->config->item('sales_invoice_format'))); ?>
     </div>
 </div>
 

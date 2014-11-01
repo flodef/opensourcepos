@@ -52,36 +52,20 @@ class Sale_lib
 		$this->CI->session->unset_userdata('comment');
 	}
 	
-	function get_employee_id() 
-
+	function get_invoice_number()
 	{
-		return $this->CI->session->userdata('employee_id');
-	}
-		
-	function get_sale_id() 
-	{
-		return $this->CI->session->userdata('sale_id');
-	}	
-	
-	function set_sale_id($sale_id) 
-	{	
-	$this->CI->session->set_userdata('sale_id', $sale_id);
+		return $this->CI->session->userdata('sales_invoice_number');
 	}
 	
-	function get_trans_no()
-    {
-    	return $this->CI->session->userdata('sale_trans_no');
-    }
-    
-    function set_trans_no($trans_no)
-    {
-    	$this->CI->session->set_userdata('sale_trans_no', $trans_no);
-    }
-    
-    function clear_trans_no()
-    {
-    	$this->CI->session->unset_userdata('sale_trans_no');
-    }
+	function set_invoice_number($invoice_number)
+	{
+		$this->CI->session->set_userdata('sales_invoice_number', $invoice_number);
+	}
+	
+	function clear_invoice_number()
+	{
+		$this->CI->session->unset_userdata('sales_invoice_number');
+	}
 	
 	function get_email_receipt() 
 	{
@@ -260,7 +244,7 @@ class Sale_lib
 		}
 
 		$insertkey=$maxkey+1;
-		$item_info=$this->CI->Item->get_info($item_id);
+		$item_info=$this->CI->Item->get_info($item_id,$item_location);
 		//array/cart records are identified by $insertkey and item_id is just another field.
 		$item = array(($insertkey)=>
 		array(
@@ -373,6 +357,10 @@ class Sale_lib
 		{
 			return $this->CI->Sale->exists($pieces[1]);
 		}
+		else 
+		{
+			return $this->CI->Sale->get_sale_by_invoice_number($receipt_sale_id)->num_rows() > 0;
+		}
 
 		return false;
 	}
@@ -404,8 +392,6 @@ class Sale_lib
 			$this->add_item($row->item_id,-$row->quantity_purchased,$row->item_location,$row->discount_percent,$row->item_unit_price,$row->description,$row->serialnumber);
 		}
 		$this->set_customer($this->CI->Sale->get_customer($sale_id)->person_id);
-		//$this->set_trans_no($this->CI->Sale_suspended->get_trans_no($sale_id));
-		//$this->set_trans_no($this->CI->Sale->get_trans_no($sale_id));
 	}
 	
 	function add_item_kit($external_item_kit_id,$item_location)
@@ -450,9 +436,10 @@ class Sale_lib
 		{
 			$this->add_payment($row->payment_type,$row->payment_amount);
 		}
-		$this->set_customer($this->CI->Sale_suspended->get_customer($sale_id)->person_id);
-		$this->set_comment($this->CI->Sale_suspended->get_comment($sale_id));
-		$this->set_trans_no($this->CI->Sale_suspended->get_trans_no($sale_id));
+		$suspended_sale_info=$this->CI->Sale_suspended->get_info($sale_id)->row();
+		$this->set_customer($suspended_sale_info->person_id);
+		$this->set_comment($suspended_sale_info->comment);
+		$this->set_invoice_number($suspended_sale_info->invoice_number);
 	}
 
 	function delete_item($line)
@@ -482,8 +469,8 @@ class Sale_lib
 		$this->clear_mode();
 		$this->empty_cart();
 		$this->clear_comment();
-		$this->clear_trans_no();
 		$this->clear_email_receipt();
+		$this->clear_invoice_number();
 		$this->empty_payments();
 		$this->remove_customer();
 	}

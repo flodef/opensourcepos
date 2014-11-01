@@ -14,6 +14,13 @@ class Sale_suspended extends CI_Model
 		$this->db->where('sale_id',$sale_id);
 		return $this->db->get();
 	}
+	
+	function get_invoice_count()
+	{
+		$this->db->from('sales_suspended');
+		$this->db->where('invoice_number is not null');
+		return $this->db->count_all_results();
+	}
 
 	function exists($sale_id)
 	{
@@ -32,7 +39,7 @@ class Sale_suspended extends CI_Model
 		return $success;
 	}
 	
-	function save ($items,$customer_id,$employee_id,$comment,$trans_no,$payments,$sale_id=false)
+	function save ($items,$customer_id,$employee_id,$comment,$invoice_number,$payments,$sale_id=false)
 	{
 		if(count($items)==0)
 			return -1;
@@ -51,7 +58,7 @@ class Sale_suspended extends CI_Model
 			'employee_id'=>$employee_id,
 			'payment_type'=>$payment_types,
 			'comment'=>$comment,
-			'trans_no'=>$trans_no
+			'invoice_number'=>$invoice_number
 		);
 
 		//Run these queries as a transaction, we want to make sure we do all or nothing
@@ -157,13 +164,6 @@ class Sale_suspended extends CI_Model
 		$this->db->from('sales_suspended');
 		$this->db->where('sale_id',$sale_id);
 		return $this->db->get()->row()->comment;
-	}
-	
-	function get_trans_no($sale_id)
-	{
-		$this->db->from('sales_suspended');
-		$this->db->where('sale_id',$sale_id);
-		return $this->db->get()->row()->trans_no;
 	}
 }
 ?>

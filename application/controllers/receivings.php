@@ -69,7 +69,7 @@ class Receivings extends Secure_area
 		$item_id_or_number_or_item_kit_or_receipt = $this->input->post("item");
 		$quantity = ($mode=="receive" or $mode=="requisition") ? 1:-1;
 		$item_location = $this->receiving_lib->get_stock_source();
-		if($this->receiving_lib->is_valid_receipt($item_id_or_number_or_item_kit_or_receipt) && $mode=='return')
+		if($mode=='return' && $this->receiving_lib->is_valid_receipt($item_id_or_number_or_item_kit_or_receipt))
 		{
 			$this->receiving_lib->return_entire_receiving($item_id_or_number_or_item_kit_or_receipt);
 		}
@@ -150,11 +150,11 @@ class Receivings extends Secure_area
 			$data['amount_change'] = to_currency($data['amount_tendered'] - round($data['total'], 2));
 		}
 		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
-
+		$suppl_info	='';
 		if($supplier_id!=-1)
 		{
 			$suppl_info=$this->Supplier->get_info($supplier_id);
-			$data['supplier']=$suppl_info-> company_name;  //   first_name.' '.$suppl_info->last_name;
+			$data['supplier']=$suppl_info->company_name;  //   first_name.' '.$suppl_info->last_name;
 		}
 		$invoice_number=$this->_substitute_invoice_number($suppl_info);
 		$data['invoice_number']=$invoice_number;
@@ -163,7 +163,23 @@ class Receivings extends Secure_area
 		$data['receiving_id']='RECV '.$this->Receiving->save($data['cart'], $supplier_id,$employee_id,$comment,$payment_type,$data['stock_location'],$invoice_number);
 		if ($data['receiving_id'] == 'RECV -1')
 		{
-			$data['error_message'] = $this->lang->line('receivings_transaction_failed');
+			$data['error']=$this->lang->line('recvs_invoice_number_duplicate');
+			$this->_reload($data);
+		}
+		else
+		{
+			$data['invoice_number']=$invoice_number;
+			$data['payment_type']=$this->input->post('payment_type');
+			//SAVE receiving to database
+			$data['receiving_id']='RECV '.$this->Receiving->save($data['cart'], $supplier_id,$employee_id,$comment,$payment_type,$data['stock_location'],$invoice_number);
+			
+			if ($data['receiving_id'] == 'RECV -1')
+			{
+				$data['error_message'] = $this->lang->line('receivings_transaction_failed');
+			}
+	
+			$this->load->view("receivings/receipt",$data);
+			$this->receiving_lib->clear_all();
 		}
 
 		$this->load->view("receivings/receipt",$data);
@@ -277,13 +293,13 @@ class Receivings extends Secure_area
 		);
 		
 		$supplier_id=$this->receiving_lib->get_supplier();
-		$info='';
+		$suppl_info='';
 		if($supplier_id!=-1)
 		{
-			$info=$this->Supplier->get_info($supplier_id);
-			$data['supplier']=$info->company_name;  // first_name.' '.$info->last_name;
+			$suppl_info=$this->Supplier->get_info($supplier_id);
+			$data['supplier']=$suppl_info->company_name;  // first_name.' '.$info->last_name;
 		}
-		$data['invoice_number']=$this->_substitute_invoice_number($info);
+		$data['invoice_number']=$this->_substitute_invoice_number($suppl_info);
 		
 		$this->load->view("receivings/receiving",$data);
 		$this->_remove_duplicate_cookies();
