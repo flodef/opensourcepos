@@ -23,7 +23,7 @@ if (isset($success))
 <div id="register_wrapper_cashier">
 <?php echo form_open("cashier/change_mode",array('id'=>'mode_form')); ?>
 <span><?php echo $this->lang->line('coster_trans_no') ?></span>         
-<?php echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'4'));?> 
+<?php echo form_input(array('name'=>'search_trans_no', 'id' => 'search_trans_no', 'value'=>$trans_no,'size'=>'4'));?> 
 
 <?php /*?><?php echo form_open('cashier/unsusp'); 
 echo $this->lang->line('coster_trans_no');        

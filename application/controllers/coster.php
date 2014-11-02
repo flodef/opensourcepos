@@ -59,11 +59,6 @@ class Coster extends Secure_area
  	  $this->sale_lib->set_invoice_number($this->input->post('trans_no'));
 	}
 	
-	function set_sale_id() 
-	{
- 	  $this->sale_lib->set_trans_no($this->input->post('sale_id'));
-	}
-	
 	function set_email_receipt()
 	{
  	  $this->sale_lib->set_email_receipt($this->input->post('email_receipt'));
@@ -413,7 +408,6 @@ class Coster extends Secure_area
 		$data['comment']=$this->sale_lib->get_comment();
 		$data['email_receipt']=$this->sale_lib->get_email_receipt();
 		$data['trans_no'] = $this->sale_lib->get_invoice_number();
-		var_dump($data['trans_no']);
 		$data['payments_total']=$this->sale_lib->get_payments_total();
 		$data['amount_due']=$this->sale_lib->get_amount_due();
 		$data['payments']=$this->sale_lib->get_payments();

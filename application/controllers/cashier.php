@@ -56,7 +56,7 @@ class Cashier extends Secure_area
 	
 	function set_trans_no() 
 	{
- 	  $this->sale_lib->set_trans_no($this->input->post('trans_no'));
+ 	  $this->sale_lib->set_invoice_number($this->input->post('trans_no'));
 	}
 	
 	function set_sale_id() 
@@ -260,6 +260,8 @@ class Cashier extends Secure_area
 		}
 		$trans_count=$this->Sale->get_trans_count();
 		$trans_no=str_replace('$TO',$trans_count,$trans_no);
+		$trans_count=$this->Sale_suspended->get_invoice_count();
+		$trans_no=str_replace('$SCO',$trans_count,$trans_no);
 		$trans_no=strftime($trans_no);
 		
 		$employee_id= $this->Employee->get_logged_in_employee_info();
