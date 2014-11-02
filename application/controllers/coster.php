@@ -226,30 +226,37 @@ class Coster extends Secure_area
 			$cust_info=$this->Customer->get_info($customer_id);
 			$data['customer']=$cust_info->first_name.' '.$cust_info->last_name;
 		}
-
-		//SAVE sale to database
-		$data['sale_id']='CR '.$this->Sale->save($data['cart'], $customer_id,$employee_id,$comment,$trans_no,$data['payments']);
-		if ($data['sale_id'] == 'CR -1')
+		if ($this->Sale->invoice_number_exists($trans_no))
 		{
-			$data['error_message'] = $this->lang->line('sales_transaction_failed');
+			$data['error']=$this->lang->line('sales_invoice_number_duplicate');
+			$this->_reload($data);
 		}
 		else
 		{
-			if ($this->sale_lib->get_email_receipt() && !empty($cust_info->email))
+			//SAVE sale to database
+			$data['sale_id']='CR '.$this->Sale->save($data['cart'], $customer_id,$employee_id,$comment,$trans_no,$data['payments']);
+			if ($data['sale_id'] == 'CR -1')
 			{
-				$this->load->library('email');
-				$config['mailtype'] = 'html';				
-				$this->email->initialize($config);
-				$this->email->from($this->config->item('email'), $this->config->item('company'));
-				$this->email->to($cust_info->email); 
-
-				$this->email->subject($this->lang->line('sales_receipt'));
-				$this->email->message($this->load->view("coster/receipt_email",$data, true));	
-				$this->email->send();
+				$data['error_message'] = $this->lang->line('sales_transaction_failed');
 			}
+			else
+			{
+				if ($this->sale_lib->get_email_receipt() && !empty($cust_info->email))
+				{
+					$this->load->library('email');
+					$config['mailtype'] = 'html';				
+					$this->email->initialize($config);
+					$this->email->from($this->config->item('email'), $this->config->item('company'));
+					$this->email->to($cust_info->email); 
+	
+					$this->email->subject($this->lang->line('sales_receipt'));
+					$this->email->message($this->load->view("coster/receipt_email",$data, true));	
+					$this->email->send();
+				}
+			}
+			$this->load->view("coster/receipt",$data);
+			$this->sale_lib->clear_all();
 		}
-		$this->load->view("coster/receipt",$data);
-		$this->sale_lib->clear_all();
 		$this->_remove_duplicate_cookies();
 	}
 		
