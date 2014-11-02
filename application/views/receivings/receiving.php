@@ -29,19 +29,6 @@ if(isset($error))
     }
 	}
 	?>  
-   	<?php 
-    if($mode=='receive')
-    {
-    ?>
-    <div id= 'num3'>
-
-    <?php  echo form_open("receivings/complete",array('id'=>'finish_sale_form')); ?>
-	<?php echo $this->lang->line('recvs_invoice_number') ?><span>&nbsp;</span>        
- 	<?php echo form_input(array('name'=>'invoice_number', 'id' => 'invoice_number', 'value'=>$invoice_number,'size'=>'7')); ?>
-    </div>
-    <?php
-	}
-	?>  
 	</form>
     
 	<?php echo form_open("receivings/add",array('id'=>'add_item_form')); ?>
@@ -246,7 +233,7 @@ else
 		<?php echo form_textarea(array('name'=>'comment','id'=>'comment','value'=>$comment,'rows'=>'4','cols'=>'23'));?>
 		<br /><br />
 		<table width="100%">
-		<?php /*?><?php if ($mode == "receive") 
+		<?php if ($mode == "receive") 
 		{
 		?>
 		<tr>
@@ -259,7 +246,7 @@ else
 		</tr>
 		<?php 
 		}
-		?><?php */?>
+		?>
 		<tr>
 		<td>
 		<?php echo $this->lang->line('sales_payment').':   ';?>
