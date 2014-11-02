@@ -24,11 +24,12 @@ if (isset($success))
 <span><?php echo $this->lang->line('sales_stock_location') ?></span>
 <?php echo form_dropdown('stock_location',$stock_locations,$stock_location,'onchange="$(\'#mode_form\').submit();"'); ?>
 <?php endif; ?>
-<div id= 'num3'>
-     <?php  echo form_open("sales/complete",array('id'=>'finish_sale_form')); ?>       
- 	 <span><?php echo $this->lang->line('sales_invoice_number') ?></span><span>&nbsp;</span>        
- 	 <?php echo form_input(array('name'=>'invoice_number', 'id' => 'sales_invoice_number', 'value'=>$invoice_number,'size'=>'4'));?> 
-	</div>
+<div id="show_suspended_sales_button">
+	<?php echo anchor("sales/suspended/width:425",
+	"<div class='small_button'><span style='font-size:73%;'>".$this->lang->line('sales_suspended_sales')."</span></div>",
+	array('class'=>'thickbox none','title'=>$this->lang->line('sales_suspended_sales')));
+	?>
+</div>
 	</form>
 <?php echo form_open("sales/add",array('id'=>'add_item_form')); ?>
 <label id="item_label" for="item">
@@ -37,31 +38,11 @@ if (isset($success))
 </label>
 
 <?php echo form_input(array('name'=>'item','id'=>'item','size'=>'40'));?>
-<!-- no need the new item button in sale page
 <div id="new_item_button_register" >
 		<?php echo anchor("items/view/-1/width:360",
 		"<div class='small_button'><span>".$this->lang->line('sales_new_item')."</span></div>",
 		array('class'=>'thickbox none','title'=>$this->lang->line('sales_new_item')));
 		?>
-	</div>
--->
-		
-	<div id="show_suspended_sales_button">
-	<?php
-	// This part conntrols if there are Items already in the sale.
-	if(count($cart)==0)
-	{
-	?>
-    <?php echo anchor("sales/suspended/width:425","<div class='small_button'><span style='font-size:90%;'>".$this->lang->line('sales_suspended_sales')."</span></div>",
-	array('class'=>'thickbox none','title'=>$this->lang->line('sales_suspended_sales')));
-	 }
-	else
-	{	// This part conntrols if there are suspended Items already in the cart.
-		echo "<div class='small_button' id='new_order_button'><span style='font-size:90%;'>".$this->lang->line('sales_suspended_sale_order')."</span></div>";
-	?>
-     <?php
-		}
-		?>  
 	</div>
 	</form>
 	<table id="register">

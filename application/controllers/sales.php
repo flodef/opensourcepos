@@ -129,9 +129,16 @@ class Sales extends Secure_area
 		$quantity = ($mode=="return")? -1:1;
 		$item_location = $this->sale_lib->get_sale_location();
 
-		if($this->sale_lib->is_valid_receipt($item_id_or_number_or_item_kit_or_receipt) && $mode=='return')
+		if($mode=='return' && $this->sale_lib->is_valid_receipt($item_id_or_number_or_item_kit_or_receipt))
 		{
 			$this->sale_lib->return_entire_sale($item_id_or_number_or_item_kit_or_receipt);
+		}
+		elseif($this->Sale_suspended->invoice_number_exists($item_id_or_number_or_item_kit_or_receipt))
+		{
+			$this->sale_lib->clear_all();
+			$sale_id=$this->Sale_suspended->get_sale_by_invoice_number($item_id_or_number_or_item_kit_or_receipt)->row()->sale_id;
+			$this->sale_lib->copy_entire_suspended_sale($sale_id);
+			$this->Sale_suspended->delete($sale_id);
 		}
 		elseif($this->sale_lib->is_valid_item_kit($item_id_or_number_or_item_kit_or_receipt))
 		{

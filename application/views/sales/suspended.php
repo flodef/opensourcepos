@@ -12,7 +12,7 @@
 	{
 	?>
 		<tr>
-			<td><?php echo $suspended_sale['sale_id'];?></td>
+			<td><?php echo $suspended_sale['invoice_number'];?></td>
 			<td><?php echo date('m/d/Y',strtotime($suspended_sale['sale_time']));?></td>
 			<td>
 				<?php
