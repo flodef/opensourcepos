@@ -34,7 +34,7 @@ if (isset($success))
 	{
 	?>
 	<span><?php echo $this->lang->line('coster_trans_no') ?></span>
-    <?php echo form_input(array('name'=>'trans_no','id'=>'trans_no','value'=>$trans_no,'size'=>10));?>
+    <?php echo form_input(array('name'=>'search_trans_no','id'=>'search_trans_no','value'=>$trans_no,'size'=>10));?>
     <?php
 	}
 	?>
@@ -299,8 +299,8 @@ else
 					    )).'<br />('.$customer_email.')<br />';
 				}
 				?>
+				</form>
 			</div>
-			</form>
    		<?php
 		}
 		?>
@@ -383,12 +383,12 @@ $(document).ready(function()
     	$(this).attr('value',"<?php echo $this->lang->line('sales_start_typing_customer_name'); ?>");
     });
 	
-	$('#comment').change(function() 
+	$('#comment').keyup(function() 
 	{
 		$.post('<?php echo site_url("coster/set_comment");?>', {comment: $('#comment').val()});
 	});
 	
-	$('#trans_no').change(function()
+	$('#trans_no').keyup(function()
 	{
 	$.post('<?php echo site_url("coster/set_trans_no");?>', {trans_no: $('#trans_no').val()});
 	});

@@ -157,11 +157,7 @@ class Receivings extends Secure_area
 			$data['supplier']=$suppl_info->company_name;  //   first_name.' '.$suppl_info->last_name;
 		}
 		$invoice_number=$this->_substitute_invoice_number($suppl_info);
-		$data['invoice_number']=$invoice_number;
-		$data['payment_type']=$this->input->post('payment_type');
-		//SAVE receiving to database
-		$data['receiving_id']='RECV '.$this->Receiving->save($data['cart'], $supplier_id,$employee_id,$comment,$payment_type,$data['stock_location'],$invoice_number);
-		if ($data['receiving_id'] == 'RECV -1')
+		if ($this->Receiving->invoice_number_exists($invoice_number))
 		{
 			$data['error']=$this->lang->line('recvs_invoice_number_duplicate');
 			$this->_reload($data);
@@ -172,18 +168,15 @@ class Receivings extends Secure_area
 			$data['payment_type']=$this->input->post('payment_type');
 			//SAVE receiving to database
 			$data['receiving_id']='RECV '.$this->Receiving->save($data['cart'], $supplier_id,$employee_id,$comment,$payment_type,$data['stock_location'],$invoice_number);
-			
+
 			if ($data['receiving_id'] == 'RECV -1')
 			{
-				$data['error_message'] = $this->lang->line('receivings_transaction_failed');
+				$data['error_message']=$this->lang->line('receivings_transaction_failed');	
 			}
 	
 			$this->load->view("receivings/receipt",$data);
 			$this->receiving_lib->clear_all();
 		}
-
-		$this->load->view("receivings/receipt",$data);
-		$this->receiving_lib->clear_all();
 		$this->_remove_duplicate_cookies();
 	}
 	
@@ -280,7 +273,7 @@ class Receivings extends Secure_area
 	        $data['stock_source']=$this->receiving_lib->get_stock_source();
         	$data['stock_destination']=$this->receiving_lib->get_stock_destination();
         }    
-        $data['show_stock_locations'] = $show_stock_locations;
+        $data['show_stock_locations']=$show_stock_locations;
 		
 		$data['total']=$this->receiving_lib->get_total();
 		$data['items_module_allowed']=$this->Employee->has_grant('items',$person_info->person_id);
@@ -303,6 +296,34 @@ class Receivings extends Secure_area
 		
 		$this->load->view("receivings/receiving",$data);
 		$this->_remove_duplicate_cookies();
+	}
+	
+	function save($receiving_id)
+	{
+		$receiving_data = array(
+				'receiving_time' => date('Y-m-d', strtotime($this->input->post('date'))),
+				'supplier_id' => $this->input->post('supplier_id') ? $this->input->post('supplier_id') : null,
+				'employee_id' => $this->input->post('employee_id'),
+				'comment' => $this->input->post('comment'),
+				'invoice_number' => $this->input->post('invoice_number')
+		);
+	
+		if ($this->Receiving->update($receiving_data, $receiving_id))
+		{
+			echo json_encode(array(
+					'success'=>true,
+					'message'=>$this->lang->line('recvs_successfully_updated'),
+					'id'=>$receiving_id)
+			);
+		}
+		else
+		{
+			echo json_encode(array(
+					'success'=>false,
+					'message'=>$this->lang->line('recvs_unsuccessfully_updated'),
+					'id'=>$receiving_id)
+			);
+		}
 	}
 	
 		function receives()
@@ -368,6 +389,15 @@ class Receivings extends Secure_area
     {
     	$this->receiving_lib->clear_all();
     	$this->_reload();
+    }
+    
+
+    function check_invoice_number()
+    {
+    	$receiving_id=$this->input->post('receiving_id');
+    	$invoice_number=$this->input->post('invoice_number');
+    	$exists=!empty($invoice_number) && $this->Receiving->invoice_number_exists($invoice_number,$receiving_id);
+    	echo json_encode(array('success'=>!$exists,'message'=>$this->lang->line('recvs_invoice_number_duplicate')));
     }
 
 }
