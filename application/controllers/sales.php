@@ -197,6 +197,7 @@ class Sales extends Secure_area
 
 	function remove_customer()
 	{
+		$this->sale_lib->clear_invoice_number();
 		$this->sale_lib->remove_customer();
 		$this->_reload();
 	}
@@ -218,36 +219,46 @@ class Sales extends Secure_area
 		$data['payments']=$this->sale_lib->get_payments();
 		$data['amount_change']=to_currency($this->sale_lib->get_amount_due() * -1);
 		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
-        
+        $cust_info='';
 		if($customer_id!=-1)
 		{
 			$cust_info=$this->Customer->get_info($customer_id);
 			$data['customer']=$cust_info->first_name.' '.$cust_info->last_name;
 		}
-
-		//SAVE sale to database
-		$data['sale_id']='POS '.$this->Sale->save($data['cart'], $customer_id,$employee_id,$comment,$data['payments']);
-		if ($data['sale_id'] == 'POS -1')
+		$invoice_number=$this->_substitute_invoice_number($cust_info);
+		if ($this->Sale->invoice_number_exists($invoice_number))
 		{
-			$data['error_message'] = $this->lang->line('sales_transaction_failed');
+			$data['error']=$this->lang->line('sales_invoice_number_duplicate');
+			$this->_reload($data);
 		}
 		else
 		{
-			if ($this->sale_lib->get_email_receipt() && !empty($cust_info->email))
+			$data['invoice_number']=$invoice_number;
+			//SAVE sale to database
+			$data['sale_id']='POS '.$this->Sale->save($data['cart'], $customer_id,$employee_id,$comment,$invoice_number,$data['payments']);
+			if ($data['sale_id'] == 'POS -1')
 			{
-				$this->load->library('email');
-				$config['mailtype'] = 'html';				
-				$this->email->initialize($config);
-				$this->email->from($this->config->item('email'), $this->config->item('company'));
-				$this->email->to($cust_info->email); 
-
-				$this->email->subject($this->lang->line('sales_receipt'));
-				$this->email->message($this->load->view("sales/receipt_email",$data, true));	
-				$this->email->send();
+				$data['error_message'] = $this->lang->line('sales_transaction_failed');
 			}
+			else
+			{
+				if ($this->sale_lib->get_email_receipt() && !empty($cust_info->email))
+				{
+					$this->load->library('email');
+					$config['mailtype'] = 'html';				
+					$this->email->initialize($config);
+					$this->email->from($this->config->item('email'), $this->config->item('company'));
+					$this->email->to($cust_info->email); 
+	
+					$this->email->subject($this->lang->line('sales_receipt'));
+					$this->email->message($this->load->view("sales/receipt_email",$data, true));	
+					$this->email->send();
+				}
+			}
+			$this->load->view("sales/receipt",$data);
+			$this->sale_lib->clear_all();
 		}
-		$this->load->view("sales/receipt",$data);
-		$this->sale_lib->clear_all();
+
 		$this->_remove_duplicate_cookies();
 	}
 	
@@ -466,27 +477,35 @@ class Sales extends Secure_area
 		$data['amount_change']=to_currency($this->sale_lib->get_amount_due() * -1);
 		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
 
-		if($customer_id!=-1)
-		{
-			$cust_info=$this->Customer->get_info($customer_id);
-			$data['customer']=$cust_info->first_name.' '.$cust_info->last_name;
-		}
 
-		$total_payments = 0;
-
-		foreach($data['payments'] as $payment)
+		if ($this->Sale_suspended->invoice_number_exists($invoice_number))
 		{
-			$total_payments += $payment['payment_amount'];
+			$this->_reload(array('error' => $data['error']=$this->lang->line('sales_invoice_number_duplicate')));
 		}
-
-		//SAVE sale to database
-		$data['sale_id']='POS '.$this->Sale_suspended->save($data['cart'], $customer_id,$employee_id,$comment,$invoice_number,$data['payments']);
-		if ($data['sale_id'] == 'POS -1')
+		else
 		{
-			$data['error_message'] = $this->lang->line('sales_transaction_failed');
+			if($customer_id!=-1)
+			{
+				$cust_info=$this->Customer->get_info($customer_id);
+				$data['customer']=$cust_info->first_name.' '.$cust_info->last_name;
+			}
+	
+			$total_payments = 0;
+	
+			foreach($data['payments'] as $payment)
+			{
+				$total_payments += $payment['payment_amount'];
+			}
+	
+			//SAVE sale to database
+			$data['sale_id']='POS '.$this->Sale_suspended->save($data['cart'], $customer_id,$employee_id,$comment,$invoice_number,$data['payments']);
+			if ($data['sale_id'] == 'POS -1')
+			{
+				$data['error_message'] = $this->lang->line('sales_transaction_failed');
+			}
+			$this->sale_lib->clear_all();
+			$this->_reload(array('success' => $this->lang->line('sales_successfully_suspended_sale')));
 		}
-		$this->sale_lib->clear_all();
-		$this->_reload(array('success' => $this->lang->line('sales_successfully_suspended_sale')));
 	}
 	
 	function suspended()

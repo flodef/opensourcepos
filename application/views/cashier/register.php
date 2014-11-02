@@ -30,24 +30,12 @@ echo $this->lang->line('coster_trans_no');
 echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'4'));?> 
 <input type="submit" name="submit" value="<?php echo $this->lang->line('sales_unsuspend'); ?>" id="submit">
 <?php */?>
-	<div id="show_suspended_sales_button_cashier">
-     
-    <?php
-	// This part conntrols if there are Items already in the sale.
-	if(count($cart)==0)
-	{
-	?>
-    <?php echo anchor("cashier/suspended/width:425","<div class='small_button'><span style='font-size:90%;'>".$this->lang->line('sales_suspended_sales')."</span></div>",
+<div id="show_suspended_sales_button">
+	<?php echo anchor("sales/suspended/width:425",
+	"<div class='small_button'><span style='font-size:73%;'>".$this->lang->line('sales_suspended_sales')."</span></div>",
 	array('class'=>'thickbox none','title'=>$this->lang->line('sales_suspended_sales')));
-	 }
-	else
-	{	// This part conntrols if there are suspended Items already in the cart.
-		echo "<div class='small_button' id='new_order_button'><span style='font-size:90%;'>".$this->lang->line('sales_suspended_sale_order')."</span></div>"
 	?>
-     <?php
-		}
-		?>    
-</div>  
+</div>
 </form>
 <table id="register">
 <thead>

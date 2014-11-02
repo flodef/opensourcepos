@@ -40,7 +40,7 @@ class Config extends Secure_area
 		'print_after_sale'=>$this->input->post('print_after_sale'),
         'tax_included'=>$this->input->post('tax_included'),
 		'recv_invoice_format'=>$this->input->post('recv_invoice_format'),
-		'sale_trans_format'=>$this->input->post('sale_trans_format'),
+		'sales_invoice_format'=>$this->input->post('sales_invoice_format'),
 		'custom1_name'=>$this->input->post('custom1_name'),/**GARRISON ADDED 4/20/2013**/
 		'custom2_name'=>$this->input->post('custom2_name'),/**GARRISON ADDED 4/20/2013**/
 		'custom3_name'=>$this->input->post('custom3_name'),/**GARRISON ADDED 4/20/2013**/

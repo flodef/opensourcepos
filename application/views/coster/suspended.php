@@ -12,7 +12,7 @@
 	{
 	?>
 		<tr>
-			<td><?php echo $suspended_sale['sale_id'];?></td>
+			<td><?php echo $suspended_sale['invoice_number'];?></td>
 			<td><?php echo date('m/d/Y',strtotime($suspended_sale['sale_time']));?></td>
 			<td>
 				<?php
@@ -21,14 +21,7 @@
 					$customer = $this->Customer->get_info($suspended_sale['customer_id']);
 					echo $customer->first_name. ' '. $customer->last_name;
 				}
-				else
-				{
 				?>
-					<?php
-				  
-                 echo $suspended_sale['invoice_number'];
-				}
-				?> 
 			</td>
 			<td><?php echo $suspended_sale['comment'];?></td>
 			<td>

@@ -28,32 +28,11 @@ if (isset($success))
 <?php echo form_dropdown('stock_location',$stock_locations,$stock_location,'onchange="$(\'#mode_form\').submit();"'); ?>
 <?php endif; ?>
    
-    <div id="show_suspended_sales_button_coster">
-     
-    <?php
-	{
-	?>
-	<span><?php echo $this->lang->line('coster_trans_no') ?></span>
-    <?php echo form_input(array('name'=>'search_trans_no','id'=>'search_trans_no','value'=>$trans_no,'size'=>10));?>
-    <?php
-	}
-	?>
-</div>
-    
 	</form>
 <?php echo form_open("coster/add",array('id'=>'add_item_form')); ?>
 <label id="item_label" for="item">
 
-<?php
-if($mode=='sale_retail' or $mode=='sale_wholesale')
-{
-	echo $this->lang->line('sales_find_or_scan_item');
-}
-else
-{
-	echo $this->lang->line('sales_find_or_scan_item_or_receipt');
-}
-?>
+<?php echo $this->lang->line('sales_find_or_scan_item_or_receipt'); ?>
 </label>
 
 <?php echo form_input(array('name'=>'item','id'=>'item','size'=>'40'));?>
@@ -66,21 +45,10 @@ else
 	</div>
 -->
 <div id="show_suspended_sales_button">
-	<?php
-	// This part conntrols if there are Items already in the sale.
-	if(count($cart)==0)
-	{
-	?>
-    <?php echo anchor("coster/suspended/width:425","<div class='small_button'><span style='font-size:90%;'>".$this->lang->line('sales_suspended_sales')."</span></div>",
+	<?php echo anchor("sales/suspended/width:425",
+	"<div class='small_button'><span style='font-size:73%;'>".$this->lang->line('sales_suspended_sales')."</span></div>",
 	array('class'=>'thickbox none','title'=>$this->lang->line('sales_suspended_sales')));
-	 }
-	else
-	{	// This part conntrols if there are suspended Items already in the cart.
-		echo "<div class='small_button' id='new_order_button'><span style='font-size:90%;'>".$this->lang->line('sales_suspended_sale_order')."</span></div>";
 	?>
-     <?php
-		}
-		?>  
 </div>
 	</form>
 <table id="register">
