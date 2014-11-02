@@ -17,9 +17,6 @@ if (isset($success))
 }
 ?>
 
-<?php
-// Coster display
-?>
 
 <div id="register_wrapper">
 <?php echo form_open("coster/change_mode",array('id'=>'mode_form')); ?>

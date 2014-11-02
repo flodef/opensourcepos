@@ -16,20 +16,31 @@ if (isset($success))
 	echo "<div class='success_message'>".$success."</div>";
 }
 ?>
-<?php
-// This for cashier display.
-	?>
-    
-<div id="register_wrapper_cashier">
-<?php echo form_open("cashier/change_mode",array('id'=>'mode_form')); ?>
-<span><?php echo $this->lang->line('coster_trans_no') ?></span>         
-<?php echo form_input(array('name'=>'search_trans_no', 'id' => 'search_trans_no', 'value'=>$trans_no,'size'=>'4'));?> 
 
-<?php /*?><?php echo form_open('cashier/unsusp'); 
-echo $this->lang->line('coster_trans_no');        
-echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'4'));?> 
-<input type="submit" name="submit" value="<?php echo $this->lang->line('sales_unsuspend'); ?>" id="submit">
-<?php */?>
+
+<div id="register_wrapper">
+<?php echo form_open("coster/change_mode",array('id'=>'mode_form')); ?>
+	<?php if (count($stock_locations) > 1): ?>
+<span><?php echo $this->lang->line('sales_stock_location') ?></span>
+<?php echo form_dropdown('stock_location',$stock_locations,$stock_location,'onchange="$(\'#mode_form\').submit();"'); ?>
+<?php endif; ?>
+   
+	</form>
+<?php echo form_open("cashier/add",array('id'=>'add_item_form')); ?>
+<label id="item_label" for="item">
+
+<?php echo $this->lang->line('sales_find_or_scan_item_or_receipt'); ?>
+</label>
+
+<?php echo form_input(array('name'=>'item','id'=>'item','size'=>'40'));?>
+<!-- no need the new item button in sale page
+<div id="new_item_button_register" >
+		<?php echo anchor("items/view/-1/width:360",
+		"<div class='small_button'><span>".$this->lang->line('sales_new_item')."</span></div>",
+		array('class'=>'thickbox none','title'=>$this->lang->line('sales_new_item')));
+		?>
+	</div>
+-->
 <div id="show_suspended_sales_button">
 	<?php echo anchor("sales/suspended/width:425",
 	"<div class='small_button'><span style='font-size:73%;'>".$this->lang->line('sales_suspended_sales')."</span></div>",
