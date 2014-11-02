@@ -26,7 +26,7 @@
 				?>
 					<?php
 				  
-                 echo $suspended_sale['trans_no'];
+                 echo $suspended_sale['invoice_number'];
 				}
 				?> 
 			</td>

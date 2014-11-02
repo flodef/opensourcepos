@@ -473,7 +473,7 @@ class Sales extends Secure_area
 		}
 
 		//SAVE sale to database
-		$data['sale_id']='POS '.$this->Sale_suspended->save($data['cart'], $customer_id,$employee_id,$comment,$data['payments']);
+		$data['sale_id']='POS '.$this->Sale_suspended->save($data['cart'], $customer_id,$employee_id,$comment,$invoice_number,$data['payments']);
 		if ($data['sale_id'] == 'POS -1')
 		{
 			$data['error_message'] = $this->lang->line('sales_transaction_failed');

@@ -253,12 +253,12 @@ class Coster extends Secure_area
 		
 	function _substitute_trans_no($employee_info='')
 	{
-		$trans_no=$this->sale_lib->get_trans_no();
+		$trans_no=$this->sale_lib->get_invoice_number();
 		if (empty($trans_no))
 		{
-			$trans_no=$this->config->config['sale_trans_format'];
+			$trans_no=$this->config->config['sales_invoice_format'];
 		}
-		$trans_count=$this->Sale->get_trans_count();
+		$trans_count=$this->Sale->get_invoice_count();
 		$trans_no=str_replace('$TO',$trans_count,$trans_no);
 		$trans_no=strftime($trans_no);
 		
@@ -410,7 +410,7 @@ class Coster extends Secure_area
 		$data['items_module_allowed']=$this->Employee->has_grant('items', $person_info->person_id);
 		$data['comment']=$this->sale_lib->get_comment();
 		$data['email_receipt']=$this->sale_lib->get_email_receipt();
-		$data['trans_no'] = $this->sale_lib->get_trans_no();
+		$data['trans_no'] = $this->sale_lib->get_invoice_number();
 		$data['payments_total']=$this->sale_lib->get_payments_total();
 		$data['amount_due']=$this->sale_lib->get_amount_due();
 		$data['payments']=$this->sale_lib->get_payments();

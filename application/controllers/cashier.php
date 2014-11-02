@@ -410,7 +410,7 @@ class Cashier extends Secure_area
 		$data['items_module_allowed']=$this->Employee->has_grant('items', $person_info->person_id);
 		$data['comment']=$this->sale_lib->get_comment();
 		$data['email_receipt']=$this->sale_lib->get_email_receipt();
-		$data['trans_no'] = $this->sale_lib->get_trans_no();
+		$data['trans_no'] = $this->sale_lib->get_invoice_number();
 		$data['payments_total']=$this->sale_lib->get_payments_total();
 		$data['amount_due']=$this->sale_lib->get_amount_due();
 		$data['payments']=$this->sale_lib->get_payments();
