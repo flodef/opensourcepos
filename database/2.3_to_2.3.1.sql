@@ -98,3 +98,8 @@ ALTER TABLE `ospos_sales`
 ALTER TABLE `ospos_sales_suspended` 
    ADD COLUMN `invoice_number` varchar(32) DEFAULT NULL,
    ADD UNIQUE `invoice_number` (`invoice_number`);
+   
+   -- add invoice_number column to receivings table
+ALTER TABLE `ospos_items` 
+   ADD COLUMN `receivings_quantity` int(11) DEFAULT '0',
+   ADD UNIQUE `invoice_number` (`invoice_number`);

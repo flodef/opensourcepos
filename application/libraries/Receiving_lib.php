@@ -190,7 +190,7 @@ class Receiving_lib
 			'serialnumber'=>$serialnumber!=null ? $serialnumber: '',
 			'allow_alt_description'=>$item_info->allow_alt_description,
 			'is_serialized'=>$item_info->is_serialized,
-			'quantity'=>$quantity,
+			'quantity'=>$quantity*$item_info->receiving_quantity,
             'discount'=>$discount,
 			'in_stock'=>$this->CI->Item_quantities->get_item_quantity($item_id, $item_location)->quantity,
 			'price'=>$price!=null ? $price: $item_info->cost_price
