@@ -180,7 +180,7 @@ class Item extends CI_Model
 		$this->db->where_in('item_id',$item_ids);
 		return $this->db->update('items', array('deleted' => 1));
  	}
-
+ 	
  	/*
 	Get search suggestions to find items
 	*/

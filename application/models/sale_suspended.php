@@ -178,5 +178,18 @@ class Sale_suspended extends CI_Model
 		$this->db->where('sale_id',$sale_id);
 		return $this->db->get()->row()->comment;
 	}
+	
+	function get_invoice_number_suggestions($search,$limit=25)
+	{
+		$suggestions=array();
+		$this->db->from('sales_suspended');
+		$this->db->like('invoice_number', $search);
+		$query=$this->db->get();
+		foreach($query->result() as $row)
+		{
+			$suggestions[]=$row->sale_id.'|'.$row->invoice_number;
+		}
+		return $suggestions;
+	}
 }
 ?>

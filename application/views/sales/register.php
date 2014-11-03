@@ -294,6 +294,20 @@ else
 
 			<?php echo form_open("sales/add_payment",array('id'=>'add_payment_form')); ?>
 			<table width="100%">
+			<?php if ($mode == "sale") 
+				{
+				?>
+				<tr>
+					<td>
+						<?php echo $this->lang->line('sales_invoice_number').':   ';?>
+					</td>
+					<td>
+						<?php echo form_input(array('name'=>'sales_invoice_number','id'=>'sales_invoice_number','value'=>$invoice_number,'size'=>10));?>
+					</td>
+				</tr>
+				<?php 
+				}
+				?>
 				<tr>
 					<td>
 				<?php echo $this->lang->line('sales_payment').':   ';?>

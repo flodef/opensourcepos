@@ -15,9 +15,8 @@ class Cashier extends Secure_area
 
 	function item_search()
 	{
-		$suggestions = $this->Item->get_item_search_suggestions($this->input->post('q'),$this->input->post('limit'));
-		$suggestions = array_merge($suggestions, $this->Item_kit->get_item_kit_search_suggestions($this->input->post('q'),$this->input->post('limit')));
-		echo implode("\n",$suggestions);
+		$suggestions = $this->Sale_suspended->get_invoice_number_suggestions($this->input->post('q'),$this->input->post('limit'));
+		echo htmlentities(implode("\n",$suggestions));
 	}
 
 	function customer_search()
@@ -138,25 +137,18 @@ class Cashier extends Secure_area
 		{
 			$this->sale_lib->return_entire_sale($item_id_or_number_or_item_kit_or_receipt);
 		}
+		elseif($this->Sale_suspended->exists($item_id_or_number_or_item_kit_or_receipt))
+		{
+			$this->sale_lib->clear_all();
+			$this->sale_lib->copy_entire_suspended_sale($item_id_or_number_or_item_kit_or_receipt);
+			$this->Sale_suspended->delete($item_id_or_number_or_item_kit_or_receipt);
+		}
 		elseif($this->Sale_suspended->invoice_number_exists($item_id_or_number_or_item_kit_or_receipt))
 		{
 			$this->sale_lib->clear_all();
 			$sale_id=$this->Sale_suspended->get_sale_by_invoice_number($item_id_or_number_or_item_kit_or_receipt)->row()->sale_id;
 			$this->sale_lib->copy_entire_suspended_sale($sale_id);
 			$this->Sale_suspended->delete($sale_id);
-		}
-		elseif($this->sale_lib->is_valid_item_kit($item_id_or_number_or_item_kit_or_receipt))
-		{
-			$this->sale_lib->add_item_kit($item_id_or_number_or_item_kit_or_receipt,$item_location);
-		}
-		elseif(!$this->sale_lib->add_item($item_id_or_number_or_item_kit_or_receipt,$quantity,$item_location))
-		{
-			$data['error']=$this->lang->line('sales_unable_to_add_item');
-		}
-		
-		if($this->sale_lib->out_of_stock($item_id_or_number_or_item_kit_or_receipt,$item_location))
-		{
-			$data['warning'] = $this->lang->line('sales_quantity_less_than_zero');
 		}
 		$this->_reload($data);
 	}
