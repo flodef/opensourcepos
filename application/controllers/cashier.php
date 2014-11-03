@@ -491,14 +491,21 @@ class Cashier extends Secure_area
 			$total_payments += $payment['payment_amount'];
 		}
 
-		//SAVE sale to database
-		$data['sale_id']='CR '.$this->Sale_suspended->save($data['cart'], $customer_id,$employee_id,$comment,$trans_no,$data['payments']);
-		if ($data['sale_id'] == 'PO -1')
+		if ($this->Sale_suspended->invoice_number_exists($trans_no))
 		{
-			$data['error_message'] = $this->lang->line('sales_transaction_failed');
+			$this->_reload(array('error' => $data['error']=$this->lang->line('sales_invoice_number_duplicate')));
 		}
-		$this->sale_lib->clear_all();
-		$this->_reload(array('success' => $this->lang->line('sales_successfully_post_sale')));
+		else
+		{
+			//SAVE sale to database
+			$data['sale_id']='CR '.$this->Sale_suspended->save($data['cart'], $customer_id,$employee_id,$comment,$trans_no,$data['payments']);
+			if ($data['sale_id'] == 'PO -1')
+			{
+				$data['error_message'] = $this->lang->line('sales_transaction_failed');
+			}
+			$this->sale_lib->clear_all();
+			$this->_reload(array('success' => $this->lang->line('sales_successfully_suspended_sale')));
+		}
 	}
 	
 	function suspended()

@@ -196,7 +196,7 @@ else
                 <div class="float_left" style="text-align:center;font-weight:bold;font-size:16px;">
 				<label id="comment_label" for="comment"><?php echo $this->lang->line('common_comments'); ?>:</label></div>
 				<?php echo form_textarea(array('name'=>'comment', 'id' => 'comment', 'value'=>$comment,'rows'=>'4','cols'=>'28'));?>
-	          	<?php echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'31'));?> 
+	          	<?php echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'25'));?> 
                 <br /><br />   
 				<?php
 				

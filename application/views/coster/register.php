@@ -242,7 +242,7 @@ else
 				<?php echo form_open("coster/complete",array('id'=>'finish_sale_form')); ?>
 				<label id="comment_label" for="comment"><?php echo $this->lang->line('common_comments'); ?>:</label>
 				<?php echo form_textarea(array('name'=>'comment', 'id' => 'comment', 'value'=>$comment,'rows'=>'4','cols'=>'28'));?>
-	          	<?php echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'31'));?> 
+	          	<?php echo form_input(array('name'=>'trans_no', 'id' => 'trans_no', 'value'=>$trans_no,'size'=>'25'));?> 
                 <br /><br />      
 		<?php
 		// Only show this part if there is at least one payment entered.
@@ -284,7 +284,7 @@ else
 		<div style="height:40px;">
 
 			<div class='small_button' id='post_order_button' style='margin:15 auto;'>
-				<span><?php echo $this->lang->line('sales_add_payment_coster'); ?></span>
+				<span><?php echo $this->lang->line('sales_suspend_sale'); ?></span>
             </div>
 		</div>
 	</div>
