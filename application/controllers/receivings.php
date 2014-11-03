@@ -91,17 +91,14 @@ class Receivings extends Secure_area
 
 		$this->form_validation->set_rules('price', 'lang:items_price', 'required|numeric');
 		$this->form_validation->set_rules('quantity', 'lang:items_quantity', 'required|integer');
-		//$this->form_validation->set_rules('discount', 'lang:items_discount', 'required|integer');
+		$this->form_validation->set_rules('discount', 'lang:items_discount', 'required|integer');
 
-    	//$invoice_number = $this->input->post("recv_invoice_number");
-		$description = $this->input->post("description");
+    	$description = $this->input->post("description");
     	$serialnumber = $this->input->post("serialnumber");
 		$price = $this->input->post("price");
 		$quantity = $this->input->post("quantity");
 		$discount = $this->input->post("discount");
 		$item_location = $this->input->post("location");
-		$comment = $this->input->post("comment");
-		
 
 		if ($this->form_validation->run() != FALSE)
 		{
@@ -114,11 +111,51 @@ class Receivings extends Secure_area
 
 		$this->_reload($data);
 	}
+	
+	function edit($receiving_id)
+	{
+		$data = array();
+	
+		$data['suppliers'] = array('' => 'No Supplier');
+		foreach ($this->Supplier->get_all()->result() as $supplier)
+		{
+			$data['suppliers'][$supplier->person_id] = $supplier->first_name . ' ' . $supplier->last_name;
+		}
+	
+		$data['employees'] = array();
+		foreach ($this->Employee->get_all()->result() as $employee)
+		{
+			$data['employees'][$employee->person_id] = $employee->first_name . ' '. $employee->last_name;
+		}
+	
+		$receiving_info = $this->Receiving->get_info($receiving_id)->row_array();
+		$person_name = $receiving_info['first_name'] . " " . $receiving_info['last_name'];
+		$data['selected_supplier'] = !empty($receiving_info['supplier_id']) ? $receiving_info['supplier_id'] . "|" . $person_name : "";
+		$data['receiving_info'] = $receiving_info;
+	
+		$this->load->view('receivings/form', $data);
+	}
 
 	function delete_item($item_number)
 	{
 		$this->receiving_lib->delete_item($item_number);
 		$this->_reload();
+	}
+	
+	function delete($receiving_id = -1, $update_inventory=TRUE) 
+	{
+		$employee_id=$this->Employee->get_logged_in_employee_info()->person_id;
+		$receiving_ids=$receiving_id == -1 ? $this->input->post('ids') : array($receiving_id);
+	
+		if($this->Receiving->delete_list($receiving_ids, $employee_id, $update_inventory))
+		{
+			echo json_encode(array('success'=>true,'message'=>$this->lang->line('recvs_successfully_deleted').' '.
+					count($receiving_ids).' '.$this->lang->line('recvs_one_or_multiple'),'ids'=>$receiving_ids));
+		}
+		else
+		{
+			echo json_encode(array('success'=>false,'message'=>$this->lang->line('recvs_cannot_be_deleted')));
+		}
 	}
 
 	function delete_supplier()
@@ -143,7 +180,6 @@ class Receivings extends Secure_area
 		$emp_info=$this->Employee->get_info($employee_id);
 		$payment_type=$this->input->post('payment_type');
         $data['stock_location']=$this->receiving_lib->get_stock_source();
-
 		if ($this->input->post('amount_tendered'))
 		{
 			$data['amount_tendered'] = $this->input->post('amount_tendered');
@@ -168,10 +204,10 @@ class Receivings extends Secure_area
 			$data['payment_type']=$this->input->post('payment_type');
 			//SAVE receiving to database
 			$data['receiving_id']='RECV '.$this->Receiving->save($data['cart'], $supplier_id,$employee_id,$comment,$payment_type,$data['stock_location'],$invoice_number);
-
+			
 			if ($data['receiving_id'] == 'RECV -1')
 			{
-				$data['error_message']=$this->lang->line('receivings_transaction_failed');	
+				$data['error_message'] = $this->lang->line('receivings_transaction_failed');
 			}
 	
 			$this->load->view("receivings/receipt",$data);
@@ -232,6 +268,7 @@ class Receivings extends Secure_area
 		$this->receiving_lib->copy_entire_receiving($receiving_id);
 		$data['cart']=$this->receiving_lib->get_cart();
 		$data['total']=$this->receiving_lib->get_total();
+		$data['mode']=$this->receiving_lib->get_mode();
 		$data['receipt_title']=$this->lang->line('recvs_receipt');
 		$data['transaction_time']= date('m/d/Y h:i:s a', strtotime($receiving_info['receiving_time']));
 		$stock_locations = $this->Stock_locations->get_undeleted_all()->result_array();
@@ -242,11 +279,11 @@ class Receivings extends Secure_area
 		$data['invoice_number']=$this->receiving_lib->get_invoice_number();
 
 		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
-		
+
 		if($supplier_id!=-1)
 		{
 			$supplier_info=$this->Supplier->get_info($supplier_id);
-			$data['supplier']=$supplier_info->company_name;  // first_name.' '.$supplier_info->last_name;
+			$data['supplier']=$supplier_info->first_name.' '.$supplier_info->last_name;
 		}
 		$data['receiving_id']='RECV '.$receiving_id;
 		$this->load->view("receivings/receipt",$data);
@@ -256,10 +293,6 @@ class Receivings extends Secure_area
 
 	function _reload($data=array())
 	{
-
-		$data['stock_locations'] = array();
-        $stock_locations = $this->Stock_locations->get_undeleted_all()->result_array();
-		$show_stock_locations = count($stock_locations) > 1;
 		$person_info = $this->Employee->get_logged_in_employee_info();
 		$data['cart']=$this->receiving_lib->get_cart();
 		$data['modes']=array('receive'=>$this->lang->line('recvs_receiving'),'return'=>$this->lang->line('recvs_return'));
@@ -274,7 +307,7 @@ class Receivings extends Secure_area
         	$data['stock_destination']=$this->receiving_lib->get_stock_destination();
         }    
         $data['show_stock_locations']=$show_stock_locations;
-		
+        
 		$data['total']=$this->receiving_lib->get_total();
 		$data['items_module_allowed']=$this->Employee->has_grant('items',$person_info->person_id);
 		$data['comment']=$this->receiving_lib->get_comment();
@@ -325,65 +358,6 @@ class Receivings extends Secure_area
 			);
 		}
 	}
-	
-		function receives()
-	{
-		$data['cart']=$this->receiving_lib->get_cart();
-		$data['subtotal']=$this->receiving_lib->get_subtotal();
-		$data['taxes']=$this->receiving_lib->get_taxes();
-		$data['total']=$this->receiving_lib->get_total();
-		$data['receipt_title']=$this->lang->line('sales_receipt');
-		$data['transaction_time']= date('m/d/Y h:i:s a');
-		$supplier_id=$this->receiving_lib->get_supplier();
-		$employee_id=$this->Employee->get_logged_in_employee_info()->person_id;
-		$comment = $this->input->post('comment');
-		$invoice_number = $this->input->post('recv_invoice_number');
-		$emp_info=$this->Employee->get_info($employee_id);
-		$payment_type = $this->input->post('payment_type');
-		$data['payment_type']=$this->input->post('payment_type');
-		//Alain Multiple payments
-		$data['payments']=$this->receiving_lib->get_payments();
-		$data['amount_change']=to_currency($this->sale_lib->get_amount_due() * -1);
-		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
-
-		if($supplier_id!=-1)
-		{
-			$supp_info=$this->Supplier->get_info($supplier_id);
-			$data['supplier']=$supp_info-> company_name;  //first_name.' '.$supp_info->last_name;
-		}
-
-		$total_payments = 0;
-
-		foreach($data['payments'] as $payment)
-		{
-			$total_payments += $payment['payment_amount'];
-		}
-
-		//SAVE sale to database
-		$data['receiving_id']='RECVS '.$this->Receiving_inv->save($data['cart'], $supplier_id,$employee_id,$invoice_number,$comment,$data['payments']);
-		if ($data['receiving_id'] == 'RECVS -1')
-		{
-			$data['error_message'] = $this->lang->line('sales_transaction_failed');
-		}
-		$this->receiving_lib->clear_all();
-		$this->_reload(array('success' => $this->lang->line('sales_successfully_post_sale')));
-	}
-	
-	function received()
-	{
-		$data = array();
-		$data['received_receivings'] = $this->Receiving_inv->get_all()->result_array();
-		$this->load->view('receivings/received', $data);
-	}
-		
-		function recvsinv()
-	{
-		$receiving_id = $this->input->post('received_receiving_id');
-		$this->receiving_lib->clear_all();
-		$this->receiving_lib->copy_entire_Receiving_inv($receiving_id);
-		$this->Receiving_inv->delete($receiving_id);
-    	$this->_reload();
-	}
 
     function cancel_receiving()
     {
@@ -391,12 +365,11 @@ class Receivings extends Secure_area
     	$this->_reload();
     }
     
-
     function check_invoice_number()
     {
-    	$receiving_id=$this->input->post('receiving_id');
-    	$invoice_number=$this->input->post('invoice_number');
-    	$exists=!empty($invoice_number) && $this->Receiving->invoice_number_exists($invoice_number,$receiving_id);
+		$receiving_id=$this->input->post('receiving_id');
+		$invoice_number=$this->input->post('invoice_number');
+		$exists=!empty($invoice_number) && $this->Receiving->invoice_number_exists($invoice_number,$receiving_id);
     	echo json_encode(array('success'=>!$exists,'message'=>$this->lang->line('recvs_invoice_number_duplicate')));
     }
 
