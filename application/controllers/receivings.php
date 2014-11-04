@@ -208,7 +208,7 @@ class Receivings extends Secure_area
 			$data['invoice_number']=$invoice_number;
 			$data['payment_type']=$this->input->post('payment_type');
 			//SAVE receiving to database
-			$data['receiving_id']='RECV '.$this->Receiving->save($data['cart'], $supplier_id,$employee_id,$comment,$payment_type,$invoice_number,$data['stock_location']);
+			$data['receiving_id']='RECV '.$this->Receiving->save($data['cart'], $supplier_id,$employee_id,$comment,$invoice_number,$payment_type,$data['stock_location']);
 			
 			if ($data['receiving_id'] == 'RECV -1')
 			{
