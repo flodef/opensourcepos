@@ -40,7 +40,6 @@ $lang['recvs_stock_locaiton']='Stock location';
 $lang['recvs_error_requisition']='Unable to move inventory from and to the same stock location';
 $lang['recvs_invoice_number']='Invoice #';
 $lang['recvs_receipt_number']='Receiving #';
-
 $lang['recvs_date'] = 'Receiving Date';
 $lang['recvs_successfully_updated'] = 'Receiving successfully updated';
 $lang['recvs_unsuccessfully_updated'] = 'Receiving unsuccessfully updated';

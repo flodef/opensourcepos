@@ -62,6 +62,11 @@ class Receivings extends Secure_area
 		$this->receiving_lib->set_invoice_number($this->input->post('recv_invoice_number'));
 	}
 	
+	function set_receiving_date()
+	{
+		$this->receiving_lib->set_receiving_date($this->input->post('receiving_date'));
+	}
+	
 	function add()
 	{
 		$data=array();
@@ -170,7 +175,7 @@ class Receivings extends Secure_area
 		$data['cart']=$this->receiving_lib->get_cart();
 		$data['total']=$this->receiving_lib->get_total();
 		$data['receipt_title']=$this->lang->line('recvs_receipt');
-		$data['transaction_time']= date('m/d/Y h:i:s a');
+		$data['transaction_time']=$this->receiving_lib->get_receiving_date();
 		$data['mode']=$this->receiving_lib->get_mode();
 		$stock_locations = $this->Stock_locations->get_undeleted_all()->result_array();
 		$data['show_stock_locations'] = count($stock_locations) > 1;
@@ -311,6 +316,7 @@ class Receivings extends Secure_area
 		$data['total']=$this->receiving_lib->get_total();
 		$data['items_module_allowed']=$this->Employee->has_grant('items',$person_info->person_id);
 		$data['comment']=$this->receiving_lib->get_comment();
+		$data['receiving_date']=$this->receiving_lib->get_receiving_date();
 		$data['payment_options']=array(
 			$this->lang->line('sales_cash') => $this->lang->line('sales_cash'),
 			$this->lang->line('sales_check') => $this->lang->line('sales_check'),

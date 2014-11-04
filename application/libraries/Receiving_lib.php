@@ -86,6 +86,25 @@ class Receiving_lib
     {
     	$this->CI->session->unset_userdata('comment');
     }
+    
+    function get_receiving_date()
+    {
+	    if(!$this->CI->session->userdata('receiving_date'))
+	    {
+			$this->set_receiving_date(date('m/d/Y h:i:s a'));
+	    }
+    	return $this->CI->session->userdata('receiving_date');
+    }
+    
+    function set_receiving_date($receiving_date)
+    {
+    	$this->CI->session->set_userdata('receiving_date', $receiving_date);
+    }
+    
+    function clear_receiving_date()
+    {
+    	$this->CI->session->unset_userdata('receiving_date');
+    }
    
 	function get_invoice_number()
     {
@@ -372,6 +391,7 @@ class Receiving_lib
 		$this->delete_supplier();
 		$this->clear_comment();
 		$this->clear_invoice_number();
+		$this->clear_receiving_date();
 	}
 	
 	function get_item_total($quantity, $price, $discount_percentage)

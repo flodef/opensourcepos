@@ -200,14 +200,22 @@ else
         <label id="comment_label" for="comment"><?php echo $this->lang->line('common_comments'); ?>:</label>
         <?php echo form_textarea(array('name'=>'comment','id'=>'comment','value'=>$comment,'rows'=>'4','cols'=>'23'));?>
         <br /><br />
-        
+        <tr>
+		<td>
+		<!-- <label id="receiving_date_label" for="receiving_date"><?php echo $this->lang->line('recvs_date'); ?>:</label> -->
+		</td>
+		<td>
+		<?php echo form_input(array('name'=>'receiving_date','id'=>'receiving_date','value'=>date('m/d/Y', strtotime($receiving_date)),'size'=>10));?>
+		</td>
+		</tr>
+		<div class="clearfix"></div>
         <div class='small_button' id='finish_sale_button' style='float:right;margin-top:5px;'>
         	<span><?php echo $this->lang->line('recvs_complete_receiving') ?></span>
         </div>
         </form>    
         <?php echo form_open("receivings/cancel_receiving",array('id'=>'cancel_sale_form')); ?>
         <div class='small_button' id='cancel_sale_button' style='float:left;margin-top:5px;'>
-        <span><?php echo $this->lang->line('recvs_cancel_receving')?></span>
+        <span><?php echo $this->lang->line('recvs_cancel_receiving')?></span>
         </div>
         </form>
      </div>
@@ -237,6 +245,7 @@ else
 		<?php 
 		}
 		?>
+		
 		<tr>
 		<td>
 		<?php echo $this->lang->line('sales_payment').':   ';?>
@@ -342,6 +351,15 @@ $(document).ready(function()
 	$('#recv_invoice_number').keyup(function() 
 	{
 		$.post('<?php echo site_url("receivings/set_invoice_number");?>', {recv_invoice_number: $('#recv_invoice_number').val()});
+	});
+
+	$('#receiving_date').datePicker({
+        numberOfMonths: 3,
+        startDate: '01/01/1970'
+    });
+	$('#receiving_date').change(function() 
+	{
+		$.post('<?php echo site_url("receivings/set_receiving_date");?>', {receiving_date: $('#receiving_date').val()});
 	});
 
     $("#finish_sale_button").click(function()
