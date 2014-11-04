@@ -285,7 +285,7 @@ class Coster extends Secure_area
 			}
 			$trans_no=str_replace('$TI',$acronym,$trans_no);
 		}
-		//$this->sale_lib->set_trans_no('sale_trans_no');
+		$this->sale_lib->set_invoice_number($trans_no);
 		return $trans_no;
 	}
 
@@ -471,7 +471,7 @@ class Coster extends Secure_area
 		$customer_id=$this->sale_lib->get_customer();
 		$employee_id=$this->Employee->get_logged_in_employee_info()->person_id;
 		$comment = $this->input->post('comment');
-		$trans_no = $this->input->post('trans_no');
+		$trans_no = $this->sale_lib->get_invoice_number();
 		$emp_info=$this->Employee->get_info($employee_id);
 		$payment_type = $this->input->post('payment_type');
 		$data['payment_type']=$this->input->post('payment_type');
