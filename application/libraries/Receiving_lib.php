@@ -374,10 +374,9 @@ class Receiving_lib
 		$this->clear_invoice_number();
 	}
 	
-	function get_item_total($quantity, $receiving_quantity, $price, $discount_percentage)
+	function get_item_total($quantity, $price, $discount_percentage)
 	{
 		$total = bcmul($quantity, $price, PRECISION);
-		$total = bcmul($receiving_quantity, $total, PRECISION);
 		$discount_fraction = bcdiv($discount_percentage, 100, PRECISION);
 		$discount_amount =  bcmul($total, $discount_fraction, PRECISION);
 		return bcsub($total, $discount_amount, PRECISION);
@@ -388,7 +387,7 @@ class Receiving_lib
 		$total = 0;
 		foreach($this->get_cart() as $item)
 		{
-			$total += $this->get_item_total($item['quantity'], $item['receiving_quantity'], $item['price'], $item['discount']);
+			$total += $this->get_item_total($item['quantity'], $item['price'], $item['discount']);
 		}
 		
 		return $total;

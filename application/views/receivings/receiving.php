@@ -133,7 +133,7 @@ else
 <?php
 		    }
 ?>
-	    <td><?php echo to_currency($item['price']*$item['quantity']*$item['receiving_quantity']-$item['price']*$item['quantity']*$item['receiving_quantity']*$item['discount']/100); ?></td>
+	    <td><?php echo to_currency($item['price']*$item['quantity']-$item['price']*$item['quantity']*$item['discount']/100); ?></td>
 	    <td><?php echo form_submit("edit_item", $this->lang->line('sales_edit_item'));?></td>
 	    </tr>
 	    </form>

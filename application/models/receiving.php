@@ -40,7 +40,7 @@ class Receiving extends CI_Model
 		return $success;
 	}
 
-	function save ($items,$supplier_id,$employee_id,$comment,$payment_type,$receiving_id=false,$invoice_number=NULL)
+	function save ($items,$supplier_id,$employee_id,$comment,$invoice_number,$payment_type,$receiving_id=false)
 	{
 		if(count($items)==0)
 			return -1;
@@ -71,7 +71,7 @@ class Receiving extends CI_Model
 				'line'=>$item['line'],
 				'description'=>$item['description'],
 				'serialnumber'=>$item['serialnumber'],
-				'quantity_purchased'=>$item['quantity'],
+				'quantity_purchased'=>$item['quantity']*$item['receiving_quantity'],
 				'discount_percent'=>$item['discount'],
 				'item_cost_price' => $cur_item_info->cost_price,
 				'item_unit_price'=>$item['price'],
