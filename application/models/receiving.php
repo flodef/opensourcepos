@@ -86,7 +86,7 @@ class Receiving extends CI_Model
                                               'item_id'=>$item['item_id'],
                                               'location_id'=>$item['item_location']), $item['item_id'], $item['item_location']);
 			
-			$qty_recv = $item['quantity'];
+			$qty_recv = $item['quantity']*$item['receiving_quantity'];
 			$recv_remarks ='RECV '.$receiving_id;
 			$inv_data = array
 			(
