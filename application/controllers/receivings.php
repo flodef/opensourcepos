@@ -228,7 +228,7 @@ class Receivings extends Secure_area
 		{
 			$invoice_number=$this->config->config['recv_invoice_format'];
 		}
-		$invoice_count=$this->Receiving->get_invoice_count();
+		$invoice_count=$this->Receiving->get_max_id();
 		$invoice_number=str_replace('$CO',$invoice_count,$invoice_number);
 		$invoice_number=strftime($invoice_number);
 		

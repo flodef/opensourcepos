@@ -23,6 +23,13 @@ class Sale_suspended extends CI_Model
 		return $this->db->count_all_results();
 	}
 	
+	function get_max_id()
+	{
+		$this->db->select_max('sale_id');
+		$this->db->from('sales_suspended');
+		return $this->db->get()->row()->sale_id;
+	}
+	
 	function get_sale_by_invoice_number($invoice_number)
 	{
 		$this->db->from('sales_suspended');

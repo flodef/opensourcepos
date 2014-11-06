@@ -9,11 +9,12 @@ class Receiving extends CI_Model
 		return $this->db->get();
 	}
 	
-	function get_invoice_count()
+	function get_max_id()
 	{
-		$this->db->from('receivings');
+		$this->db->select_max('receiving_id');
 		$this->db->where('invoice_number is not null');
-		return $this->db->count_all_results();
+		$this->db->from('receivings');
+		return $this->db->get()->row()->receiving_id;
 	}
 	
 	function get_receiving_by_invoice_number($invoice_number)
@@ -82,7 +83,7 @@ class Receiving extends CI_Model
 
 			//Update stock quantity
 			$item_quantity = $this->Item_quantities->get_item_quantity($item['item_id'], $item['item_location']);		
-            $this->Item_quantities->save(array('quantity'=>$item_quantity->quantity + $item['quantity'],
+            $this->Item_quantities->save(array('quantity'=>$item_quantity->quantity + $item['quantity']*$item['receiving_quantity'],
                                               'item_id'=>$item['item_id'],
                                               'location_id'=>$item['item_location']), $item['item_id'], $item['item_location']);
 			

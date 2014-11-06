@@ -269,9 +269,9 @@ class Sales extends Secure_area
 		{
 			$invoice_number=$this->config->config['sales_invoice_format'];
 		}
-		$invoice_count=$this->Sale->get_invoice_count();
+		$invoice_count=$this->Sale->get_max_id();
 		$invoice_number=str_replace('$CO',$invoice_count,$invoice_number);
-		$invoice_count=$this->Sale_suspended->get_invoice_count();
+		$invoice_count=$this->Sale_suspended->get_max_id();
 		$invoice_number=str_replace('$SCO',$invoice_count,$invoice_number);
 		$invoice_number=strftime($invoice_number);
 	

@@ -9,6 +9,13 @@ class Sale extends CI_Model
 		return $this->db->get();
 	}
 	
+	function get_max_id()
+	{
+		$this->db->select_max('sale_id');
+		$this->db->from('sales');
+		return $this->db->get()->row()->sale_id;
+	}
+	
 	function get_invoice_count()
 	{
 		$this->db->from('sales');

@@ -265,9 +265,9 @@ class Cashier extends Secure_area
 		{
 			$trans_no=$this->config->config['sale_trans_format'];
 		}
-		$trans_count=$this->Sale->get_trans_count();
+		$trans_count=$this->Sale->get_max_id();
 		$trans_no=str_replace('$TO',$trans_count,$trans_no);
-		$trans_count=$this->Sale_suspended->get_invoice_count();
+		$trans_count=$this->Sale_suspended->get_max_id();
 		$trans_no=str_replace('$SCO',$trans_count,$trans_no);
 		$trans_no=strftime($trans_no);
 		
